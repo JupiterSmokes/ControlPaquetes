@@ -5,32 +5,44 @@
  */
 package Graficos;
 import Entidades.*;
+import DBManager.*;
 import java.awt.Image;
+import java.sql.ResultSet;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 /**
  *
  * @author DANIEL
  */
 public class Principal extends javax.swing.JFrame {
     private Usuario actual;
+    private ResultSet consulta;
     
     /**
      * Creates new form Principal
      */
     public Principal() {        
         initComponents();
+        incorrectValuesLbl.setVisible(false);
         usrShowPassBtn.setIcon(new ImageIcon(((new ImageIcon(getClass().getResource("/Graficos/eye.png"))).getImage().getScaledInstance(usrShowPassBtn.getWidth(), usrShowPassBtn.getHeight(), Image.SCALE_SMOOTH))));
-        closeAll();
-        
+        signOut();
+        connectionManager.connect();
     }
 
     public void clearLogIn(){
-        usrTxt.setText("");
-        passTxt.setText("");
+        logInUsrTxt.setText("");
+        LogInPassTxt.setText("");
+        incorrectValuesLbl.setVisible(false);
     }
     
-    public void closeAll(){
+    public void signOut(){
         logInFrame.setVisible(true);
+        menuAdministradorFile.setVisible(false);
+        menuOperadoresFile.setVisible(false);
+        menuRecepcionistaFile.setVisible(false);
+        menuAdministradorFile.setEnabled(false);
+        menuOperadoresFile.setEnabled(false);
+        menuRecepcionistaFile.setEnabled(false);
         frameCliente.doDefaultCloseAction();
         frameUsuario.doDefaultCloseAction();
         framePaquete.doDefaultCloseAction();
@@ -50,11 +62,10 @@ public class Principal extends javax.swing.JFrame {
         logInFrame = new javax.swing.JInternalFrame();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        usrTxt = new javax.swing.JTextField();
-        passTxt = new javax.swing.JPasswordField();
+        logInUsrTxt = new javax.swing.JTextField();
+        LogInPassTxt = new javax.swing.JPasswordField();
         logInBtn = new javax.swing.JButton();
-        incorrectPassLbl = new javax.swing.JLabel();
-        incorrectUsrLbl = new javax.swing.JLabel();
+        incorrectValuesLbl = new javax.swing.JLabel();
         frameCliente = new javax.swing.JInternalFrame();
         jPanel2 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
@@ -88,9 +99,18 @@ public class Principal extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         paquetePaquetesCombo = new javax.swing.JComboBox<>();
         jMenuBar1 = new javax.swing.JMenuBar();
-        administradorFileMenu = new javax.swing.JMenu();
-        operadoresFileMenu = new javax.swing.JMenu();
-        recepcionistaFileMenu = new javax.swing.JMenu();
+        menuAdministradorFile = new javax.swing.JMenu();
+        administradorMenuModificar = new javax.swing.JMenu();
+        administradorMenuUsuario = new javax.swing.JMenuItem();
+        administradorMenuRuta = new javax.swing.JMenuItem();
+        administradorMenuPC = new javax.swing.JMenuItem();
+        menuOperadoresFile = new javax.swing.JMenu();
+        operadorMenuModificar = new javax.swing.JMenu();
+        operadorMenuAlmacen = new javax.swing.JMenuItem();
+        menuRecepcionistaFile = new javax.swing.JMenu();
+        recepcionistaMenModificar = new javax.swing.JMenu();
+        recepcionistaMenuCliente = new javax.swing.JMenuItem();
+        recepcionistaMenuEnvio = new javax.swing.JMenuItem();
         sesionMenu = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
@@ -123,6 +143,9 @@ public class Principal extends javax.swing.JFrame {
             }
         });
 
+        incorrectValuesLbl.setForeground(new java.awt.Color(204, 0, 0));
+        incorrectValuesLbl.setText("Usuario/Contraseña Incorrecto");
+
         javax.swing.GroupLayout logInFrameLayout = new javax.swing.GroupLayout(logInFrame.getContentPane());
         logInFrame.getContentPane().setLayout(logInFrameLayout);
         logInFrameLayout.setHorizontalGroup(
@@ -136,39 +159,35 @@ public class Principal extends javax.swing.JFrame {
                             .addComponent(jLabel2))
                         .addGap(15, 15, 15)
                         .addGroup(logInFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(passTxt)
-                            .addComponent(usrTxt)))
+                            .addComponent(LogInPassTxt)
+                            .addComponent(logInUsrTxt)))
                     .addGroup(logInFrameLayout.createSequentialGroup()
                         .addGroup(logInFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(logInFrameLayout.createSequentialGroup()
-                                .addGap(63, 63, 63)
+                                .addGap(61, 61, 61)
                                 .addComponent(logInBtn))
                             .addGroup(logInFrameLayout.createSequentialGroup()
-                                .addGap(75, 75, 75)
-                                .addGroup(logInFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(incorrectUsrLbl)
-                                    .addComponent(incorrectPassLbl))))
-                        .addGap(0, 53, Short.MAX_VALUE)))
+                                .addGap(29, 29, 29)
+                                .addComponent(incorrectValuesLbl)))
+                        .addGap(0, 11, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         logInFrameLayout.setVerticalGroup(
             logInFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(logInFrameLayout.createSequentialGroup()
                 .addGap(51, 51, 51)
-                .addComponent(incorrectUsrLbl)
+                .addComponent(incorrectValuesLbl)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(logInFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(usrTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(25, 25, 25)
-                .addComponent(incorrectPassLbl)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(logInUsrTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(50, 50, 50)
                 .addGroup(logInFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(passTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(43, 43, 43)
+                    .addComponent(LogInPassTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(45, 45, 45)
                 .addComponent(logInBtn)
-                .addContainerGap(51, Short.MAX_VALUE))
+                .addContainerGap(42, Short.MAX_VALUE))
         );
 
         frameCliente.setClosable(true);
@@ -225,7 +244,7 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(jLabel4)
                     .addComponent(clientNitTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(clientSearchBtn))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
                 .addComponent(clientSaveBtn)
                 .addGap(33, 33, 33))
         );
@@ -271,6 +290,11 @@ public class Principal extends javax.swing.JFrame {
         usrTypeCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Administrador", "Operador", "Recepcionista" }));
 
         usrSaveBtn.setText("Guardar");
+        usrSaveBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                usrSaveBtnActionPerformed(evt);
+            }
+        });
 
         usrSearchBtn.setText("Buscar");
 
@@ -324,7 +348,7 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(usrTypeCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(35, 35, 35)
                 .addComponent(usrSaveBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(298, Short.MAX_VALUE))
+                .addContainerGap(43, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout frameUsuarioLayout = new javax.swing.GroupLayout(frameUsuario.getContentPane());
@@ -411,7 +435,7 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(paquetePriorizadoCheck))
                 .addGap(34, 34, 34)
                 .addComponent(jButton1)
-                .addContainerGap(46, Short.MAX_VALUE))
+                .addContainerGap(50, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout framePaqueteLayout = new javax.swing.GroupLayout(framePaquete.getContentPane());
@@ -441,29 +465,33 @@ public class Principal extends javax.swing.JFrame {
         jDesktopPane1Layout.setHorizontalGroup(
             jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jDesktopPane1Layout.createSequentialGroup()
-                .addGap(61, 61, 61)
-                .addComponent(logInFrame, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addContainerGap()
                 .addGroup(jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(frameCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(framePaquete, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(frameUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jDesktopPane1Layout.createSequentialGroup()
+                        .addComponent(framePaquete, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(44, 44, 44)
+                        .addComponent(logInFrame, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(49, 49, 49)
+                        .addComponent(frameUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(frameCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jDesktopPane1Layout.setVerticalGroup(
             jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jDesktopPane1Layout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addGroup(jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(frameUsuario)
+                .addGroup(jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jDesktopPane1Layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(framePaquete, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(frameCliente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(logInFrame, javax.swing.GroupLayout.PREFERRED_SIZE, 285, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(31, Short.MAX_VALUE))
+                        .addGap(114, 114, 114)
+                        .addComponent(logInFrame, javax.swing.GroupLayout.PREFERRED_SIZE, 306, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jDesktopPane1Layout.createSequentialGroup()
+                        .addGap(30, 30, 30)
+                        .addGroup(jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(frameUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jDesktopPane1Layout.createSequentialGroup()
+                                .addComponent(framePaquete, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(47, 47, 47)
+                                .addComponent(frameCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(117, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -483,14 +511,52 @@ public class Principal extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        administradorFileMenu.setText("jMenu1");
-        jMenuBar1.add(administradorFileMenu);
+        menuAdministradorFile.setText("Archivo");
 
-        operadoresFileMenu.setText("jMenu1");
-        jMenuBar1.add(operadoresFileMenu);
+        administradorMenuModificar.setText("Modificar");
 
-        recepcionistaFileMenu.setText("jMenu1");
-        jMenuBar1.add(recepcionistaFileMenu);
+        administradorMenuUsuario.setText("Usuario");
+        administradorMenuUsuario.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                administradorMenuUsuarioActionPerformed(evt);
+            }
+        });
+        administradorMenuModificar.add(administradorMenuUsuario);
+
+        administradorMenuRuta.setText("Ruta");
+        administradorMenuModificar.add(administradorMenuRuta);
+
+        administradorMenuPC.setText("Punto De Control");
+        administradorMenuModificar.add(administradorMenuPC);
+
+        menuAdministradorFile.add(administradorMenuModificar);
+
+        jMenuBar1.add(menuAdministradorFile);
+
+        menuOperadoresFile.setText("Archivo");
+
+        operadorMenuModificar.setText("Modificar");
+
+        operadorMenuAlmacen.setText("Almacen");
+        operadorMenuModificar.add(operadorMenuAlmacen);
+
+        menuOperadoresFile.add(operadorMenuModificar);
+
+        jMenuBar1.add(menuOperadoresFile);
+
+        menuRecepcionistaFile.setText("Archivo");
+
+        recepcionistaMenModificar.setText("Modificar");
+
+        recepcionistaMenuCliente.setText("Cliente");
+        recepcionistaMenModificar.add(recepcionistaMenuCliente);
+
+        recepcionistaMenuEnvio.setText("Envio");
+        recepcionistaMenModificar.add(recepcionistaMenuEnvio);
+
+        menuRecepcionistaFile.add(recepcionistaMenModificar);
+
+        jMenuBar1.add(menuRecepcionistaFile);
 
         sesionMenu.setText("Sesion");
 
@@ -537,13 +603,54 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        closeAll();
+        signOut();
         clearLogIn();
+        actual = null;
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void logInBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logInBtnActionPerformed
-    frameCliente.setVisible(true);
-    frameUsuario.setVisible(true);
+//    frameCliente.setVisible(true);
+//    frameUsuario.setVisible(true);
+//    connectionManager.check();
+        String uName = "";
+        String uPass;
+        incorrectValuesLbl.setVisible(false);
+        try {
+            uName = logInUsrTxt.getText();
+            uPass = String.copyValueOf(LogInPassTxt.getPassword());
+            consulta = connectionManager.select("Usuario", "*", "Usuario = '" +uName+ "' AND Password = '" + uPass + "'");
+                consulta.first();
+             if (!consulta.wasNull()) {
+                actual = new Usuario(consulta.getString("Nombre")
+                        , consulta.getString("Usuario")
+                        , consulta.getString("Password"),
+                        consulta.getInt("Tipo"));
+            } else {
+                incorrectValuesLbl.setVisible(true);
+            }
+            System.out.println(actual.getNombre());
+        } catch (Exception e) {
+           incorrectValuesLbl.setVisible(true);
+            //e.printStackTrace();
+        }
+        if (actual != null) {
+            logInFrame.doDefaultCloseAction();
+            switch (actual.getTipo()) {
+                case 1:
+                    menuAdministradorFile.setVisible(true);
+                    menuAdministradorFile.setEnabled(true);
+                    break;
+                case 2:
+                    menuOperadoresFile.setVisible(true);
+                    menuOperadoresFile.setEnabled(true);
+                    break;
+                default:
+                    throw new AssertionError();
+            }
+        }
+        
+
+//    connectionManager.select("Usuario", "Usuario", "Password = 'test'");
     }//GEN-LAST:event_logInBtnActionPerformed
 
     private void clientSaveBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clientSaveBtnActionPerformed
@@ -562,6 +669,24 @@ public class Principal extends javax.swing.JFrame {
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         setExtendedState(this.MAXIMIZED_BOTH); 
     }//GEN-LAST:event_formWindowOpened
+
+    private void administradorMenuUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_administradorMenuUsuarioActionPerformed
+        frameUsuario.setVisible(true);
+    }//GEN-LAST:event_administradorMenuUsuarioActionPerformed
+
+    private void usrSaveBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usrSaveBtnActionPerformed
+       String table = "Usuario",
+               usr = usrUsrTxt.getText(),
+               pass = String.valueOf(usrPassTxt.getPassword()),
+               name = usrNameTxt.getText();
+       int type = usrTypeCombo.getSelectedIndex()+1;
+       String values = String.format("'%s','%s','%s',%d", usr, pass, name, type);
+        if (connectionManager.select(table, "Usuario", "'"+usr+"'") != null) {
+            connectionManager.insert(table, values);
+        } else {
+            JOptionPane.showMessageDialog(rootPane, "Nombre de usuario no disponible");
+        }
+    }//GEN-LAST:event_usrSaveBtnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -600,7 +725,11 @@ public class Principal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenu administradorFileMenu;
+    private javax.swing.JPasswordField LogInPassTxt;
+    private javax.swing.JMenu administradorMenuModificar;
+    private javax.swing.JMenuItem administradorMenuPC;
+    private javax.swing.JMenuItem administradorMenuRuta;
+    private javax.swing.JMenuItem administradorMenuUsuario;
     private javax.swing.JTextField clientNameTxt;
     private javax.swing.JTextField clientNitTxt;
     private javax.swing.JButton clientSaveBtn;
@@ -608,8 +737,7 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JInternalFrame frameCliente;
     private javax.swing.JInternalFrame framePaquete;
     private javax.swing.JInternalFrame frameUsuario;
-    private javax.swing.JLabel incorrectPassLbl;
-    private javax.swing.JLabel incorrectUsrLbl;
+    private javax.swing.JLabel incorrectValuesLbl;
     private javax.swing.JButton jButton1;
     private javax.swing.JDesktopPane jDesktopPane1;
     private javax.swing.JLabel jLabel1;
@@ -633,20 +761,25 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JButton logInBtn;
     private javax.swing.JInternalFrame logInFrame;
-    private javax.swing.JMenu operadoresFileMenu;
+    private javax.swing.JTextField logInUsrTxt;
+    private javax.swing.JMenu menuAdministradorFile;
+    private javax.swing.JMenu menuOperadoresFile;
+    private javax.swing.JMenu menuRecepcionistaFile;
+    private javax.swing.JMenuItem operadorMenuAlmacen;
+    private javax.swing.JMenu operadorMenuModificar;
     private javax.swing.JTextField paqueteNitTxt;
     private javax.swing.JComboBox<String> paquetePaquetesCombo;
     private javax.swing.JFormattedTextField paquetePesoTxt;
     private javax.swing.JCheckBox paquetePriorizadoCheck;
-    private javax.swing.JPasswordField passTxt;
-    private javax.swing.JMenu recepcionistaFileMenu;
+    private javax.swing.JMenu recepcionistaMenModificar;
+    private javax.swing.JMenuItem recepcionistaMenuCliente;
+    private javax.swing.JMenuItem recepcionistaMenuEnvio;
     private javax.swing.JMenu sesionMenu;
     private javax.swing.JTextField usrNameTxt;
     private javax.swing.JPasswordField usrPassTxt;
     private javax.swing.JButton usrSaveBtn;
     private javax.swing.JButton usrSearchBtn;
     private javax.swing.JToggleButton usrShowPassBtn;
-    private javax.swing.JTextField usrTxt;
     private javax.swing.JComboBox<String> usrTypeCombo;
     private javax.swing.JTextField usrUsrTxt;
     // End of variables declaration//GEN-END:variables
