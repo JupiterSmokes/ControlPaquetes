@@ -64,9 +64,10 @@ public class connectionManager {
     }
     
     public static ResultSet select(String table, String fields, String conditions){
+        result = null;
         String selectStatement = "SELECT " + fields + " FROM " + table + " WHERE " + conditions;
         try {
-            PreparedStatement preparedSelect = connection.prepareStatement(selectStatement);
+            PreparedStatement preparedSelect = connection.prepareStatement(selectStatement, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             if (checkStatement(selectStatement)) {
                 result = preparedSelect.executeQuery();
                 return result;

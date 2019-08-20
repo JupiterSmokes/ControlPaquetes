@@ -22,6 +22,10 @@ public class Usuario {
         this.tipo = tipo;
     }
 
+    public String insert(){
+        return String.format("'%s','%s','%s',%d", this.usuario, this.password, this.nombre, this.tipo);
+    }
+    
     public String getNombre() {
         return nombre;
     }
