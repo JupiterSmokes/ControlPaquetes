@@ -5,13 +5,23 @@
  */
 package Entidades;
 
+import DBManager.Insertable;
+
 /**
  *
  * @author DANIEL
  */
-public class Cliente {
+public class Cliente implements Insertable{
     private String nombre; //Nombre del cliente
     private String nit; //Numero de identificacion tributaria (Llave primaria)
+
+        public String insert(){
+            return String.format("'%s','%s'", this.nit, this.nombre, this.nombre);
+        }
+         @Override
+        public String table() {
+            return this.getClass().getSimpleName();
+        }
 
     public Cliente(String nombre, String nit) {
         this.nombre = nombre;

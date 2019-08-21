@@ -5,11 +5,13 @@
  */
 package Entidades;
 
+import DBManager.Insertable;
+
 /**
  *
  * @author DANIEL
  */
-public class Usuario {
+public class Usuario implements Insertable{
     private String nombre;
     private String usuario;
     private String password;
@@ -24,6 +26,10 @@ public class Usuario {
 
     public String insert(){
         return String.format("'%s','%s','%s',%d", this.usuario, this.password, this.nombre, this.tipo);
+    }
+     @Override
+    public String table() {
+        return this.getClass().getSimpleName();
     }
     
     public String getNombre() {
@@ -53,6 +59,8 @@ public class Usuario {
     public void setTipo(int tipo) {
         this.tipo = tipo;
     }
+
+   
     
     
 }

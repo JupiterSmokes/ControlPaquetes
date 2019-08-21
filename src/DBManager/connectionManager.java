@@ -79,6 +79,22 @@ public class connectionManager {
         return null;
     }
     
+    public static boolean insert(Insertable obj){
+      String sql = "INSERT INTO %s VALUES (%s)";
+      sql = String.format(sql, obj.table(), obj.insert());
+      try {
+            PreparedStatement preparedInsert = connection.prepareStatement(sql);
+            preparedInsert.executeUpdate();
+            System.out.println("Correcto " + sql);
+            connection.commit();
+            return true;
+        } catch (Exception e) {
+            System.out.println("Incorrecto " + sql);
+           // e.printStackTrace();
+            return false;
+        } 
+    }
+    
     public static void insert(String table, String values){
         String sql = "INSERT INTO %s VALUES (%s)";
         sql = String.format(sql, table, values);
