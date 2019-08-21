@@ -26,11 +26,17 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Ruta"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="administradorMenuRutaActionPerformed"/>
+                  </Events>
                 </MenuItem>
                 <MenuItem class="javax.swing.JMenuItem" name="administradorMenuPC">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Punto De Control"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="administradorMenuPCActionPerformed"/>
+                  </Events>
                 </MenuItem>
               </SubComponents>
             </Menu>
@@ -50,6 +56,9 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Almacen"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="operadorMenuAlmacenActionPerformed"/>
+                  </Events>
                 </MenuItem>
               </SubComponents>
             </Menu>
@@ -69,11 +78,17 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cliente"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="recepcionistaMenuClienteActionPerformed"/>
+                  </Events>
                 </MenuItem>
                 <MenuItem class="javax.swing.JMenuItem" name="recepcionistaMenuEnvio">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Envio"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="recepcionistaMenuEnvioActionPerformed"/>
+                  </Events>
                 </MenuItem>
               </SubComponents>
             </Menu>

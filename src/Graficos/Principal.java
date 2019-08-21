@@ -1085,9 +1085,19 @@ public class Principal extends javax.swing.JFrame {
         administradorMenuModificar.add(administradorMenuUsuario);
 
         administradorMenuRuta.setText("Ruta");
+        administradorMenuRuta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                administradorMenuRutaActionPerformed(evt);
+            }
+        });
         administradorMenuModificar.add(administradorMenuRuta);
 
         administradorMenuPC.setText("Punto De Control");
+        administradorMenuPC.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                administradorMenuPCActionPerformed(evt);
+            }
+        });
         administradorMenuModificar.add(administradorMenuPC);
 
         menuAdministradorFile.add(administradorMenuModificar);
@@ -1099,6 +1109,11 @@ public class Principal extends javax.swing.JFrame {
         operadorMenuModificar.setText("Modificar");
 
         operadorMenuAlmacen.setText("Almacen");
+        operadorMenuAlmacen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                operadorMenuAlmacenActionPerformed(evt);
+            }
+        });
         operadorMenuModificar.add(operadorMenuAlmacen);
 
         menuOperadoresFile.add(operadorMenuModificar);
@@ -1110,9 +1125,19 @@ public class Principal extends javax.swing.JFrame {
         recepcionistaMenModificar.setText("Modificar");
 
         recepcionistaMenuCliente.setText("Cliente");
+        recepcionistaMenuCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                recepcionistaMenuClienteActionPerformed(evt);
+            }
+        });
         recepcionistaMenModificar.add(recepcionistaMenuCliente);
 
         recepcionistaMenuEnvio.setText("Envio");
+        recepcionistaMenuEnvio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                recepcionistaMenuEnvioActionPerformed(evt);
+            }
+        });
         recepcionistaMenModificar.add(recepcionistaMenuEnvio);
 
         menuRecepcionistaFile.add(recepcionistaMenModificar);
@@ -1252,6 +1277,26 @@ public class Principal extends javax.swing.JFrame {
             Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_usrSaveBtnActionPerformed
+
+    private void administradorMenuRutaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_administradorMenuRutaActionPerformed
+        frameRuta.setVisible(true);
+    }//GEN-LAST:event_administradorMenuRutaActionPerformed
+
+    private void administradorMenuPCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_administradorMenuPCActionPerformed
+        framePuntoControl.setVisible(true);
+    }//GEN-LAST:event_administradorMenuPCActionPerformed
+
+    private void operadorMenuAlmacenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operadorMenuAlmacenActionPerformed
+        frameAlmacen.setVisible(true);
+    }//GEN-LAST:event_operadorMenuAlmacenActionPerformed
+
+    private void recepcionistaMenuClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_recepcionistaMenuClienteActionPerformed
+        frameCliente.setVisible(true);
+    }//GEN-LAST:event_recepcionistaMenuClienteActionPerformed
+
+    private void recepcionistaMenuEnvioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_recepcionistaMenuEnvioActionPerformed
+        framePaquete.setVisible(true);
+    }//GEN-LAST:event_recepcionistaMenuEnvioActionPerformed
 
     /**
      * @param args the command line arguments
