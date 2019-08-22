@@ -12,5 +12,8 @@ package DBManager;
 public interface Insertable {
     
     public  String insert();
+    public String select(String[] fields);
+    public String where(String[] fields);
+    public String update(String[] fields);
     public String table();
 }

@@ -79,6 +79,29 @@ public class connectionManager {
         return null;
     }
     
+    public static ResultSet select(Insertable obj, String[] fields, String[] conditions){
+        result = null;
+        String sql = "SELECT %s FROM %s";
+        if  (conditions != null){ 
+            sql += " WHERE %s";
+            sql = String.format(sql, obj.select(fields), obj.table(), obj.where(conditions)); //,condition
+        }else {
+            sql = String.format(sql, obj.select(fields), obj.table());
+        } //,condition
+        System.out.println(sql);
+        try {
+            PreparedStatement preparedSelect = connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            if (checkStatement(sql)) {
+                result = preparedSelect.executeQuery();
+                return result;
+            }
+           
+        } catch (SQLException ex) {
+            Logger.getLogger(connectionManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    
     public static boolean insert(Insertable obj){
       String sql = "INSERT INTO %s VALUES (%s)";
       sql = String.format(sql, obj.table(), obj.insert());
@@ -106,6 +129,28 @@ public class connectionManager {
         } catch (Exception e) {
             System.out.println("Incorrecto " + sql);
             e.printStackTrace();
+        } 
+    }
+    
+    public static boolean update(Insertable obj,String[] fields, String[] conditions){
+        //Siempre invocar despues de un SETTER
+        String sql = "UPDATE %s SET %s";
+        if  (conditions != null){ 
+            sql += " WHERE %s";
+            sql = String.format(sql, obj.table(), obj.update(fields), obj.where(conditions));
+        } else {
+            sql = String.format(sql, obj.table(), obj.update(fields));
+        }
+        try {
+              PreparedStatement preparedInsert = connection.prepareStatement(sql);
+              preparedInsert.executeUpdate();
+              System.out.println("Correcto " + sql);
+              connection.commit();
+              return true;
+          } catch (Exception e) {
+              System.out.println("Incorrecto " + sql);
+             // e.printStackTrace();
+              return false;
         } 
     }
 }

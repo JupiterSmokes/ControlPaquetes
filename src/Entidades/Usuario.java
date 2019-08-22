@@ -32,6 +32,88 @@ public class Usuario implements Insertable{
         return this.getClass().getSimpleName();
     }
     
+    public String update(String[] fields){
+        String update = "";
+        for (String field : fields) {
+            switch (field.toLowerCase()) {
+               case "nombre": 
+                   update += ", Nombre = '" + this.nombre + "'";
+                   break;
+               case "password": 
+                   update += ", Password = '" + this.password + "'";
+                   break;
+               case "usuario": 
+                   update += ", Usuario = '" + this.usuario + "'";
+                   break;
+               case "tipo": 
+                   update += ", Tipo = " + this.tipo;
+                   break;
+            }
+        }
+        if (update.charAt(0) == ',') update = update.replaceFirst(",", "");
+        return update;
+    }
+    
+    public String select(String[] fields){
+        String select = "";
+        for (String field : fields) {
+            switch (field.toLowerCase()) {
+               case "nombre": 
+                   select += ", Nombre";
+                   break;
+               case "password": 
+                   select += ", Password";
+                   break;
+               case "usuario": 
+                   select += ", Usuario";
+                   break;
+               case "tipo": 
+                   select += ", Tipo";
+                   break;
+//               case "nombre": 
+//                   select += ", Nombre";
+//                   break;
+//               case "nombre": 
+//                   select += ", Nombre";
+//                   break;             
+               default:
+                   select += "*";
+            }
+        }
+        if (select.charAt(0) == ',') select = select.replaceFirst(",", "");
+        return select;
+    }
+
+    public String where(String[] fields){
+        String condition = "";
+        for (String field : fields) {
+            switch (field.toLowerCase()) {
+               case "nombre": 
+                   condition += "AND Nombre = '" + this.nombre + "' ";
+                   break;
+               case "password": 
+                   condition += "AND Password = '" + this.password + "' ";
+                   break;
+               case "usuario": 
+                   condition += "AND Usuario = '" + this.usuario + "' ";
+                   break;
+               case "tipo": 
+                   condition += "AND Tipo = " + this.tipo + " ";
+                   break;
+//               case "nombre": 
+//                   select += ", Nombre";
+//                   break;
+//               case "nombre": 
+//                   select += ", Nombre";
+//                   break;             
+            }
+        }
+         condition = condition.replaceFirst("AND", "");
+        return condition;
+    }
+    
+    
+    
     public String getNombre() {
         return nombre;
     }

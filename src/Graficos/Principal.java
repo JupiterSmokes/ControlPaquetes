@@ -19,7 +19,9 @@ import javax.swing.JOptionPane;
  */
 public class Principal extends javax.swing.JFrame {
     private Usuario actual;
+    private Insertable buscado;
     private ResultSet consulta;
+    private boolean actualizar;
     public static final int LOGINFRAM = 0,
                     FRAMEALMACEN = 1,
                     FRAMECLIENTE = 2,
@@ -37,6 +39,7 @@ public class Principal extends javax.swing.JFrame {
         incorrectValuesLbl.setVisible(false);
         usrShowPassBtn.setIcon(new ImageIcon(((new ImageIcon(getClass().getResource("/Graficos/eye.png"))).getImage().getScaledInstance(usrShowPassBtn.getWidth(), usrShowPassBtn.getHeight(), Image.SCALE_SMOOTH))));
         signOut();
+        actualizar = false;
         connectionManager.connect();
     }
 
@@ -126,6 +129,78 @@ public class Principal extends javax.swing.JFrame {
         frameRuta.doDefaultCloseAction();
         clear(true, 0);
         actual = null;
+    }
+    
+    public Insertable recuperar(ResultSet recuperado, String table){
+         Insertable buscado;
+        try {
+            switch (table.toLowerCase()){
+             case "almacen":
+                    buscado = new Almacen(recuperado.getInt("CodEnvio"),
+                    recuperado.getInt("CodPc"),
+                            recuperado.getInt("CodRuta"),
+                            recuperado.getInt("CodDestino"),
+                            recuperado.getInt("Tiempo"),
+                            recuperado.getDouble("TarifaA"),
+                            recuperado.getDouble("Costo")
+                    );
+                    break;
+             case "cliente":
+                 buscado = new Cliente(recuperado.getString("Nombre")
+                        , consulta.getString("Nit"));
+                 break;
+             case "destino":
+                    buscado = new Destino(recuperado.getInt("Codigo"),
+                    recuperado.getString("Direccion"),
+                            recuperado.getDouble("Cuota")
+                    );
+                    break;
+             case "envio":
+                    buscado = new Envio(recuperado.getInt("Codigo"),
+                            recuperado.getInt("CodPaquete"),
+                            recuperado.getInt("CodRuta"),
+                            recuperado.getInt("CodDestino"),
+                            recuperado.getDouble("CostoT"),
+                            recuperado.getInt("TiempoT"),
+                            recuperado.getInt("Recibido")
+                    );
+                    break;
+             case "paquete":
+                    buscado = new Paquete(recuperado.getInt("Codigo"),
+                    recuperado.getDouble("Peso"),
+                            recuperado.getString("NIT"),
+                            recuperado.getInt("Priorizado")
+                    );
+             case "puntocontrol":
+                    buscado = new PuntoControl(recuperado.getInt("Codigo"),
+                    recuperado.getInt("CodRuta"),
+                            recuperado.getInt("CodDestino"),
+                            recuperado.getDouble("Tarifa"),
+                            recuperado.getDouble("TarifaG"),
+                            recuperado.getInt("Limite"),
+                            recuperado.getString("Ubicacion")
+                    );
+                    break;
+             case "ruta":
+                    buscado = new Ruta(recuperado.getInt("Codigo"),
+                    recuperado.getInt("CodDestino"),
+                            recuperado.getInt("Estado")
+                    );
+                    break;
+             case "usuario":
+                    buscado = new Usuario(recuperado.getString("Nombre"),
+                    recuperado.getString("Usuario"),
+                            recuperado.getString("Password"),
+                            recuperado.getInt("Tipo")
+                    );
+                    break;
+             default:
+                 buscado = null;
+            }
+            return buscado;
+        } catch (Exception e) {
+        }
+        return null;
     }
     
     /**
@@ -439,6 +514,11 @@ public class Principal extends javax.swing.JFrame {
         });
 
         usrSearchBtn.setText("Buscar");
+        usrSearchBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                usrSearchBtnActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -845,7 +925,7 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(pcTarifaDeOperacionTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(35, 35, 35)
                 .addComponent(pcSaveBtn)
-                .addContainerGap(77, Short.MAX_VALUE))
+                .addContainerGap(81, Short.MAX_VALUE))
         );
 
         frameEnvio.setClosable(true);
@@ -937,7 +1017,7 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(envioRecibidoCheck))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(envioGuardarBtn)
-                .addContainerGap(70, Short.MAX_VALUE))
+                .addContainerGap(74, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout frameEnvioLayout = new javax.swing.GroupLayout(frameEnvio.getContentPane());
@@ -1041,7 +1121,7 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(almacenTiempoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel35)
                     .addComponent(almacenCostoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 68, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
                 .addComponent(almacenGuardarBtn)
                 .addGap(27, 27, 27))
         );
@@ -1268,17 +1348,21 @@ public class Principal extends javax.swing.JFrame {
 //    connectionManager.check();
         String uName = "";
         String uPass;
+        Usuario iniciando;
         incorrectValuesLbl.setVisible(false);
         try {
             uName = logInUsrTxt.getText();
             uPass = String.copyValueOf(LogInPassTxt.getPassword());
-            consulta = connectionManager.select("Usuario", "*", "Usuario = '" +uName+ "' AND Password = '" + uPass + "'");
+            iniciando = new Usuario("", uName, uPass, 0);
+//            consulta = connectionManager.select("Usuario", "*", "Usuario = '" +uName+ "' AND Password = '" + uPass + "'");
+            consulta = connectionManager.select(iniciando, new String[] {"*"}, new String[] {"usuario", "password"});
                 consulta.first();
              if (!consulta.wasNull()) {
-                actual = new Usuario(consulta.getString("Nombre")
-                        , consulta.getString("Usuario")
-                        , consulta.getString("Password"),
-                        consulta.getInt("Tipo"));
+//                actual = new Usuario(consulta.getString("Nombre")
+//                        , consulta.getString("Usuario")
+//                        , consulta.getString("Password"),
+//                        consulta.getInt("Tipo"));
+                actual = (Usuario) recuperar(consulta, Usuario.class.getSimpleName());
             } else {
                 incorrectValuesLbl.setVisible(true);
             }
@@ -1356,10 +1440,15 @@ public class Principal extends javax.swing.JFrame {
             int type = usrTypeCombo.getSelectedIndex()+1;
             Usuario nuevo = new Usuario(name, usr, pass, type);
 //            if (!connectionManager.select(table, table, table+" = '"+usr+"'").isBeforeFirst()) {
-                if (connectionManager.insert(nuevo)){
+                if (actualizar == false && connectionManager.insert(nuevo)){
                     JOptionPane.showMessageDialog(almacenTiempoTxt, nuevo.getUsuario() + " Correctamente Ingresado");
-                
-            } else {
+                    clear(false, 7);
+               // consulta = connectionManager.select(nuevo, new String[] {"*"}, null);
+            } else if (actualizar == true && connectionManager.update(nuevo, new String[] {"nombre", "usuario", "password", "tipo"}, new String[] {"usuario"})){
+                JOptionPane.showMessageDialog(frameUsuario, nuevo.getUsuario() + " Correctamente actualizado");
+                actualizar = false;
+                    clear(false, 7);
+            }else {
                 JOptionPane.showMessageDialog(rootPane, "Nombre de usuario no disponible");
             }
         } catch (Exception ex) {
@@ -1386,6 +1475,35 @@ public class Principal extends javax.swing.JFrame {
     private void recepcionistaMenuEnvioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_recepcionistaMenuEnvioActionPerformed
         framePaquete.setVisible(true);
     }//GEN-LAST:event_recepcionistaMenuEnvioActionPerformed
+
+    private void usrSearchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usrSearchBtnActionPerformed
+       String usrName = "";
+        clear(false, 7);
+        if (usrName.equals("")) usrName = JOptionPane.showInputDialog("Porfavor ingrese el Nombre de Usuario a buscar");
+        buscado = new Usuario("", usrName, "", 0);
+        consulta = connectionManager.select(buscado, new String[] {"*"}, new String[] {"usuario"});
+         try {    
+            consulta.first();
+            if (!consulta.wasNull()) {
+                  buscado = recuperar(consulta, "Usuario");
+//                buscado = new Usuario(consulta.getString("Nombre")
+//                       , consulta.getString("Usuario")
+//                       , consulta.getString("Password"),
+//                       consulta.getInt("Tipo"));
+                
+                usrNameTxt.setText(((Usuario) buscado).getNombre());
+                usrPassTxt.setText(((Usuario) buscado).getPassword());
+                usrUsrTxt.setText(((Usuario) buscado).getUsuario());
+                usrTypeCombo.setSelectedIndex(((Usuario) buscado).getTipo() - 1);
+                actualizar = true;
+            }
+           } catch (Exception ex) {
+              // Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+               JOptionPane.showMessageDialog(frameUsuario, usrName + " Inexistente");
+               actualizar = false;
+           }
+           
+    }//GEN-LAST:event_usrSearchBtnActionPerformed
 
     /**
      * @param args the command line arguments

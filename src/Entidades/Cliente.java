@@ -23,6 +23,58 @@ public class Cliente implements Insertable{
             return this.getClass().getSimpleName();
         }
 
+            public String update(String[] fields){
+        String update = "";
+        for (String field : fields) {
+            switch (field.toLowerCase()) {
+               case "nombre": 
+                   update += ", Nombre = '" + this.nombre + "'";
+                   break;
+               case "nit": 
+                   update += ", NIT = '" + this.nit + "'";
+                   break;
+            }
+        }
+        if (update.charAt(0) == ',') update = update.replaceFirst(",", "");
+        return update;
+            }
+        
+
+            
+    public String select(String[] fields){
+        String select = "";
+        for (String field : fields) {
+            switch (field.toLowerCase()) {
+               case "nombre": 
+                   select += ", Nombre";
+                   break;
+               case "nit": 
+                   select += ", NIT";
+                   break;
+               default:
+                   select += "*";
+            }
+        }
+        if (select.charAt(0) == ',') select = select.replaceFirst(",", "");
+        return select;
+    }
+
+    public String where(String[] fields){
+        String condition = "";
+        for (String field : fields) {
+            switch (field.toLowerCase()) {
+               case "nombre": 
+                   condition += "AND Nombre = '" + this.nombre + "' ";
+                   break;
+               case "nit": 
+                   condition += "AND NIT = '" + this.nit + "' ";
+                   break;
+            }
+        }
+         condition = condition.replaceFirst("AND", "");
+        return condition;
+    }
+        
     public Cliente(String nombre, String nit) {
         this.nombre = nombre;
         this.nit = nit;
