@@ -22,7 +22,7 @@ public class Principal extends javax.swing.JFrame {
     private Insertable buscado;
     private ResultSet consulta;
     private boolean actualizar;
-    public static final int LOGINFRAM = 0,
+    public static final int LOGINFRAME = 0,
                     FRAMEALMACEN = 1,
                     FRAMECLIENTE = 2,
                     FRAMEENVIO = 3,
@@ -45,13 +45,62 @@ public class Principal extends javax.swing.JFrame {
     }
 
     public void fillCombo(){
+         almacenCodDestinoCombo.removeAllItems(); 
+         almacenCodEnvioCombo.removeAllItems();
+         almacenCodPCCombo.removeAllItems();
+         almacenCodRutaCombo.removeAllItems();
+         envioCodPaquete.removeAllItems();
+         envioCodRutaCombo.removeAllItems();
+         envioCodDestinoCombo.removeAllItems();     
+         paquetePaquetesCombo.removeAllItems();
+         pcDestinoCombo.removeAllItems();
+         pcRutaCombo.removeAllItems();                
+         rutaCodDestinoCombo.removeAllItems();
+         
+         almacenCodDestinoCombo.addItem("Default"); //Destino
+         almacenCodEnvioCombo.addItem("Default"); //Envio
+         almacenCodPCCombo.addItem("Default"); //PC
+         almacenCodRutaCombo.addItem("Default"); //Ruta
+         envioCodPaquete.addItem("Default"); //Paquete
+         envioCodRutaCombo.addItem("Default"); //Ruta
+         envioCodDestinoCombo.addItem("Default");  //Destino
+         paquetePaquetesCombo.addItem("Default"); //Paquete
+         pcDestinoCombo.addItem("Default"); //Destino
+         pcRutaCombo.addItem("Default"); //Ruta
+         rutaCodDestinoCombo.addItem("Default"); //Destino
+        
+        try {
         buscado = new Destino(0, "", 0.00);
         consulta = connectionManager.select(buscado,new String[] {"Direccion"}, null);
-        try {
             while (consulta.next()){
                 pcDestinoCombo.addItem(consulta.getString("Direccion"));
-                
+                almacenCodDestinoCombo.addItem(consulta.getString("Direccion"));
+                envioCodDestinoCombo.addItem(consulta.getString("Direccion"));
+                rutaCodDestinoCombo.addItem(consulta.getString("Direccion"));
             }
+        buscado = new Envio(0,0,0,0);
+        consulta = connectionManager.select(buscado,new String[] {"Codigo"}, null);
+            while (consulta.next()){
+                almacenCodEnvioCombo.addItem((consulta.getInt("Codigo")));
+               }
+         buscado = new PuntoControl(0,0,0,0,0,"");
+        consulta = connectionManager.select(buscado,new String[] {"Codigo"}, null);
+            while (consulta.next()){
+                almacenCodPCCombo.addItem((consulta.getInt("Codigo")));
+               }
+            buscado = new Ruta(0,0);
+        consulta = connectionManager.select(buscado,new String[] {"Codigo"}, null);
+            while (consulta.next()){
+                almacenCodRutaCombo.addItem((consulta.getInt("Codigo")));
+                envioCodRutaCombo.addItem((consulta.getInt("Codigo")));
+                pcRutaCombo.addItem((consulta.getInt("Codigo")));
+               }
+            buscado = new Paquete(0,0,"",0);
+            consulta = connectionManager.select(buscado,new String[] {"Codigo"}, null);
+            while (consulta.next()){
+                envioCodPaquete.addItem((consulta.getInt("Codigo")));
+                paquetePaquetesCombo.addItem((consulta.getInt("Codigo")));
+               }
         } catch (SQLException ex) {
             Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -59,42 +108,44 @@ public class Principal extends javax.swing.JFrame {
     
     public void clear(boolean all, int frame){
         switch (frame) {
-            case 0:
+            case LOGINFRAME:
                 //        logInFrame = 0
                 logInUsrTxt.setText("");
                 LogInPassTxt.setText("");
                 incorrectValuesLbl.setVisible(false);
                 if (!all) break;
-            case 1:
+            case FRAMEALMACEN:
                 //        frameAlmacen = 1
                 almacenCodDestinoCombo.setSelectedIndex(0);
                 almacenCodEnvioCombo.setSelectedIndex(0);
                 almacenCodPCCombo.setSelectedIndex(0);
                 almacenCodRutaCombo.setSelectedIndex(0);
+                
                 almacenCostoTxt.setText("");
                 almacenTarifaTxt.setText("");
                 almacenTiempoTxt.setText("");
                 if (!all) break;
-            case 2:
+            case FRAMECLIENTE:
                 //        frameCliente = 2
                 clientNameTxt.setText("");
                 clientNitTxt.setText("");
                 if (!all) break;
-            case 3:
+            case FRAMEENVIO:
                 //        frameEnvio = 3
                 envioCodigoTxt.setText("");
                 envioRecibidoCheck.setSelected(false);
                 envioCodDestinoCombo.setSelectedIndex(0);
                 envioCodRutaCombo.setSelectedIndex(0);
+                envioCodPaquete.setSelectedIndex(0);
                 if (!all) break;
-            case 4:
+            case FRAMEPAQUETE:
                 //        framePaquete = 4
                 paqueteNitTxt.setText("");
                 paquetePesoTxt.setText("0");
                 paquetePriorizadoCheck.setSelected(false);
                 paquetePaquetesCombo.setSelectedIndex(0);
                 if (!all) break;
-            case 5:
+            case FRAMEPUNTOCONTROL:
                 //        framePuntoControl = 5
                 pcCodigoTxt.setText("");
                 pcDestinoCombo.setSelectedIndex(0);
@@ -102,7 +153,7 @@ public class Principal extends javax.swing.JFrame {
                 pcRutaCombo.setSelectedIndex(0);
                 pcTarifaDeOperacionTxt.setText("0");
                 if (!all) break;
-            case 6:
+            case FRAMERUTA:
                 //        frameRuta = 6
                 rutaCodDestinoCombo.setSelectedIndex(0);
                 rutaCodigoTxt.setText("");
@@ -111,7 +162,7 @@ public class Principal extends javax.swing.JFrame {
                 destinoCuotaTxt.setText("0");
                 destinoDireccionTxt.setText("");
                 if (!all) break;
-            case 7:
+            case FRAMEUSUARIO:
                 //        frameUsuario = 7
                 usrNameTxt.setText("");
                 usrPassTxt.setText("");
@@ -184,6 +235,7 @@ public class Principal extends javax.swing.JFrame {
                             recuperado.getString("NIT"),
                             recuperado.getInt("Priorizado")
                     );
+                    break;
              case "puntocontrol":
                     buscado = new PuntoControl(recuperado.getInt("Codigo"),
                     recuperado.getInt("CodRuta"),
@@ -308,7 +360,7 @@ public class Principal extends javax.swing.JFrame {
         jLabel29 = new javax.swing.JLabel();
         envioCodRutaCombo = new javax.swing.JComboBox<>();
         jLabel30 = new javax.swing.JLabel();
-        jComboBox3 = new javax.swing.JComboBox<>();
+        envioCodPaquete = new javax.swing.JComboBox<>();
         jLabel31 = new javax.swing.JLabel();
         envioRecibidoCheck = new javax.swing.JCheckBox();
         envioGuardarBtn = new javax.swing.JButton();
@@ -705,6 +757,7 @@ public class Principal extends javax.swing.JFrame {
 
         jLabel13.setText("Codgio Destino");
 
+        rutaCodDestinoCombo.setEditable(true);
         rutaCodDestinoCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item1", " " }));
 
         jLabel14.setText("Codigo");
@@ -865,10 +918,12 @@ public class Principal extends javax.swing.JFrame {
 
         jLabel21.setText("Destino");
 
+        pcDestinoCombo.setEditable(true);
         pcDestinoCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel22.setText("Ruta");
 
+        pcRutaCombo.setEditable(true);
         pcRutaCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel23.setText("Codigo");
@@ -943,7 +998,7 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(pcTarifaDeOperacionTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(35, 35, 35)
                 .addComponent(pcSaveBtn)
-                .addContainerGap(85, Short.MAX_VALUE))
+                .addContainerGap(93, Short.MAX_VALUE))
         );
 
         frameEnvio.setClosable(true);
@@ -956,15 +1011,18 @@ public class Principal extends javax.swing.JFrame {
 
         jLabel28.setText("Codigo Destino");
 
+        envioCodDestinoCombo.setEditable(true);
         envioCodDestinoCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel29.setText("Codigo Ruta");
 
+        envioCodRutaCombo.setEditable(true);
         envioCodRutaCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel30.setText("Codigo Paquete");
 
-        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        envioCodPaquete.setEditable(true);
+        envioCodPaquete.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel31.setText("Recibido");
 
@@ -982,7 +1040,7 @@ public class Principal extends javax.swing.JFrame {
                     .addGroup(jPanel6Layout.createSequentialGroup()
                         .addComponent(jLabel30)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jComboBox3, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(envioCodPaquete, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel6Layout.createSequentialGroup()
                         .addComponent(jLabel27)
                         .addGap(60, 60, 60)
@@ -1028,14 +1086,14 @@ public class Principal extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel30)
-                    .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(envioCodPaquete, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel31)
                     .addComponent(envioRecibidoCheck))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(envioGuardarBtn)
-                .addContainerGap(78, Short.MAX_VALUE))
+                .addContainerGap(86, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout frameEnvioLayout = new javax.swing.GroupLayout(frameEnvio.getContentPane());
@@ -1061,16 +1119,20 @@ public class Principal extends javax.swing.JFrame {
         frameAlmacen.setTitle("Almacen");
         frameAlmacen.setVisible(true);
 
+        almacenCodEnvioCombo.setEditable(true);
         almacenCodEnvioCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel32.setText("Codigo de Envio");
 
         jLabel33.setText("Punto de Control Actual");
 
+        almacenCodDestinoCombo.setEditable(true);
         almacenCodDestinoCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
+        almacenCodRutaCombo.setEditable(true);
         almacenCodRutaCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
+        almacenCodPCCombo.setEditable(true);
         almacenCodPCCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel34.setText("Tiempo");
@@ -1139,7 +1201,7 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(almacenTiempoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel35)
                     .addComponent(almacenCostoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 76, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 84, Short.MAX_VALUE)
                 .addComponent(almacenGuardarBtn)
                 .addGap(27, 27, 27))
         );
@@ -1219,7 +1281,7 @@ public class Principal extends javax.swing.JFrame {
                                 .addComponent(frameCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(framePuntoControl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap(67, Short.MAX_VALUE))))
+                        .addContainerGap(59, Short.MAX_VALUE))))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -1600,6 +1662,7 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JButton destinoSaveBtn;
     private javax.swing.JButton envioBuscarBtn;
     private javax.swing.JComboBox<String> envioCodDestinoCombo;
+    private javax.swing.JComboBox<String> envioCodPaquete;
     private javax.swing.JComboBox<String> envioCodRutaCombo;
     private javax.swing.JTextField envioCodigoTxt;
     private javax.swing.JButton envioGuardarBtn;
@@ -1613,7 +1676,6 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JInternalFrame frameUsuario;
     private javax.swing.JLabel incorrectValuesLbl;
     private javax.swing.JButton jButton1;
-    private javax.swing.JComboBox<String> jComboBox3;
     private javax.swing.JDesktopPane jDesktopPane1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
