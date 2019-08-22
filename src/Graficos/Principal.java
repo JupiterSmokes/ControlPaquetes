@@ -106,6 +106,10 @@ public class Principal extends javax.swing.JFrame {
         }
     }
     
+    public String[] fields(String fields){
+        return fields.split(",");
+    }
+    
     public void clear(boolean all, int frame){
         switch (frame) {
             case LOGINFRAME:
@@ -193,6 +197,25 @@ public class Principal extends javax.swing.JFrame {
         frameRuta.doDefaultCloseAction();
         clear(true, 0);
         actual = null;
+    }
+    
+    public void save(Insertable nuevo, String[] fields, String[] conditions,int frame){
+        try {   
+//            if (!connectionManager.select(table, table, table+" = '"+usr+"'").isBeforeFirst()) {
+                if (!actualizar && connectionManager.insert(nuevo)){
+                    JOptionPane.showMessageDialog(almacenTiempoTxt, nuevo.primaryKey() + " Correctamente Ingresado");
+                    clear(false, frame);
+               // consulta = connectionManager.select(nuevo, new String[] {"*"}, null);
+            } else if (actualizar && connectionManager.update(nuevo, fields, conditions)){
+                JOptionPane.showMessageDialog(frameUsuario, nuevo.primaryKey() + " Correctamente actualizado");
+                actualizar = false;
+                    clear(false, frame);
+            }else {
+                JOptionPane.showMessageDialog(rootPane, nuevo.getClass().getSimpleName() + " Ya existente");
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public Insertable recuperar(ResultSet recuperado, String table){
@@ -316,7 +339,7 @@ public class Principal extends javax.swing.JFrame {
         paquetePesoTxt = new javax.swing.JFormattedTextField();
         paquetePriorizadoCheck = new javax.swing.JCheckBox();
         jLabel12 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        paqueteSaveBtn = new javax.swing.JButton();
         paquetePaquetesCombo = new javax.swing.JComboBox<>();
         frameRuta = new javax.swing.JInternalFrame();
         jPanel5 = new javax.swing.JPanel();
@@ -347,7 +370,7 @@ public class Principal extends javax.swing.JFrame {
         pcDireccionTxt = new javax.swing.JTextField();
         jLabel24 = new javax.swing.JLabel();
         jLabel25 = new javax.swing.JLabel();
-        jSpinner1 = new javax.swing.JSpinner();
+        pcLimiteSpinner = new javax.swing.JSpinner();
         jLabel26 = new javax.swing.JLabel();
         pcTarifaDeOperacionTxt = new javax.swing.JFormattedTextField();
         pcSaveBtn = new javax.swing.JButton();
@@ -675,10 +698,15 @@ public class Principal extends javax.swing.JFrame {
 
         jLabel12.setText("Codigo");
 
-        jButton1.setText("Guardar");
+        paqueteSaveBtn.setText("Guardar");
+        paqueteSaveBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                paqueteSaveBtnActionPerformed(evt);
+            }
+        });
 
         paquetePaquetesCombo.setEditable(true);
-        paquetePaquetesCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item" }));
+        paquetePaquetesCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3" }));
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -701,7 +729,7 @@ public class Principal extends javax.swing.JFrame {
                         .addComponent(jLabel11)
                         .addGap(18, 18, 18)
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton1)
+                            .addComponent(paqueteSaveBtn)
                             .addComponent(paquetePriorizadoCheck))))
                 .addContainerGap(63, Short.MAX_VALUE))
         );
@@ -725,7 +753,7 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(jLabel11)
                     .addComponent(paquetePriorizadoCheck))
                 .addGap(34, 34, 34)
-                .addComponent(jButton1)
+                .addComponent(paqueteSaveBtn)
                 .addContainerGap(23, Short.MAX_VALUE))
         );
 
@@ -765,6 +793,11 @@ public class Principal extends javax.swing.JFrame {
         jLabel15.setText("Activa");
 
         rutaSaveBtn.setText("Guardar");
+        rutaSaveBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rutaSaveBtnActionPerformed(evt);
+            }
+        });
 
         jLabel16.setText("Ruta");
 
@@ -935,6 +968,11 @@ public class Principal extends javax.swing.JFrame {
         jLabel26.setText("Tarifa De Operacion");
 
         pcSaveBtn.setText("Guardar");
+        pcSaveBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pcSaveBtnActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout framePuntoControlLayout = new javax.swing.GroupLayout(framePuntoControl.getContentPane());
         framePuntoControl.getContentPane().setLayout(framePuntoControlLayout);
@@ -948,7 +986,7 @@ public class Principal extends javax.swing.JFrame {
                             .addGroup(framePuntoControlLayout.createSequentialGroup()
                                 .addComponent(jLabel25)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(pcLimiteSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(framePuntoControlLayout.createSequentialGroup()
                                 .addComponent(jLabel21)
                                 .addGap(18, 18, 18)
@@ -991,14 +1029,14 @@ public class Principal extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(framePuntoControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel25)
-                    .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(pcLimiteSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(framePuntoControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel26)
                     .addComponent(pcTarifaDeOperacionTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(35, 35, 35)
                 .addComponent(pcSaveBtn)
-                .addContainerGap(93, Short.MAX_VALUE))
+                .addContainerGap(109, Short.MAX_VALUE))
         );
 
         frameEnvio.setClosable(true);
@@ -1027,6 +1065,11 @@ public class Principal extends javax.swing.JFrame {
         jLabel31.setText("Recibido");
 
         envioGuardarBtn.setText("Guardar");
+        envioGuardarBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                envioGuardarBtnActionPerformed(evt);
+            }
+        });
 
         envioBuscarBtn.setText("Buscar");
 
@@ -1093,7 +1136,7 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(envioRecibidoCheck))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(envioGuardarBtn)
-                .addContainerGap(86, Short.MAX_VALUE))
+                .addContainerGap(52, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout frameEnvioLayout = new javax.swing.GroupLayout(frameEnvio.getContentPane());
@@ -1201,7 +1244,7 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(almacenTiempoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel35)
                     .addComponent(almacenCostoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 84, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 100, Short.MAX_VALUE)
                 .addComponent(almacenGuardarBtn)
                 .addGap(27, 27, 27))
         );
@@ -1275,13 +1318,13 @@ public class Principal extends javax.swing.JFrame {
                         .addGroup(jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jDesktopPane1Layout.createSequentialGroup()
                                 .addComponent(frameEnvio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(59, 59, 59)
+                                .addGap(113, 113, 113)
                                 .addComponent(frameAlmacen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jDesktopPane1Layout.createSequentialGroup()
                                 .addComponent(frameCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(framePuntoControl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap(59, Short.MAX_VALUE))))
+                        .addContainerGap(27, Short.MAX_VALUE))))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -1480,17 +1523,18 @@ public class Principal extends javax.swing.JFrame {
         String nit = clientNitTxt.getText(),
                 nombre = clientNameTxt.getText();
         nuevo = new Cliente(nombre, nit);
-        try {
-//            if (!connectionManager.select(table, table, table+" = '"+usr+"'").isBeforeFirst()) {
-                if (connectionManager.insert(nuevo)){
-                    JOptionPane.showMessageDialog(almacenTiempoTxt, nuevo.getNit() + " Correctamente Ingresado");
-                
-            } else {
-                JOptionPane.showMessageDialog(rootPane, "NIT ya ingresado");
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        save(nuevo, null, null, FRAMECLIENTE);
+//        try {
+////            if (!connectionManager.select(table, table, table+" = '"+usr+"'").isBeforeFirst()) {
+//                if (connectionManager.insert(nuevo)){
+//                    JOptionPane.showMessageDialog(almacenTiempoTxt, nuevo.getNit() + " Correctamente Ingresado");
+//                
+//            } else {
+//                JOptionPane.showMessageDialog(rootPane, "NIT ya ingresado");
+//            }
+//        } catch (Exception ex) {
+//            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+//        }
         
     }//GEN-LAST:event_clientSaveBtnActionPerformed
 
@@ -1512,28 +1556,29 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_administradorMenuUsuarioActionPerformed
 
     private void usrSaveBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usrSaveBtnActionPerformed
-        try {
-            String table = Usuario.class.getSimpleName(),
+         String //table = Usuario.class.getSimpleName(),
                     usr = usrUsrTxt.getText(),
                     pass = String.valueOf(usrPassTxt.getPassword()),
                     name = usrNameTxt.getText();
             int type = usrTypeCombo.getSelectedIndex()+1;
             Usuario nuevo = new Usuario(name, usr, pass, type);
-//            if (!connectionManager.select(table, table, table+" = '"+usr+"'").isBeforeFirst()) {
-                if (actualizar == false && connectionManager.insert(nuevo)){
-                    JOptionPane.showMessageDialog(almacenTiempoTxt, nuevo.getUsuario() + " Correctamente Ingresado");
-                    clear(false, 7);
-               // consulta = connectionManager.select(nuevo, new String[] {"*"}, null);
-            } else if (actualizar == true && connectionManager.update(nuevo, new String[] {"nombre", "usuario", "password", "tipo"}, new String[] {"usuario"})){
-                JOptionPane.showMessageDialog(frameUsuario, nuevo.getUsuario() + " Correctamente actualizado");
-                actualizar = false;
-                    clear(false, 7);
-            }else {
-                JOptionPane.showMessageDialog(rootPane, "Nombre de usuario no disponible");
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            save(nuevo, null, null, FRAMEUSUARIO);
+//        try {   
+////            if (!connectionManager.select(table, table, table+" = '"+usr+"'").isBeforeFirst()) {
+//                if (actualizar == false && connectionManager.insert(nuevo)){
+//                    JOptionPane.showMessageDialog(almacenTiempoTxt, nuevo.getUsuario() + " Correctamente Ingresado");
+//                    clear(false, 7);
+//               // consulta = connectionManager.select(nuevo, new String[] {"*"}, null);
+//            } else if (actualizar == true && connectionManager.update(nuevo, new String[] {"nombre", "usuario", "password", "tipo"}, new String[] {"usuario"})){
+//                JOptionPane.showMessageDialog(frameUsuario, nuevo.getUsuario() + " Correctamente actualizado");
+//                actualizar = false;
+//                    clear(false, 7);
+//            }else {
+//                JOptionPane.showMessageDialog(rootPane, "Nombre de usuario no disponible");
+//            }
+//        } catch (Exception ex) {
+//            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+//        }
     }//GEN-LAST:event_usrSaveBtnActionPerformed
 
     private void administradorMenuRutaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_administradorMenuRutaActionPerformed
@@ -1587,19 +1632,72 @@ public class Principal extends javax.swing.JFrame {
 
     private void destinoSaveBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_destinoSaveBtnActionPerformed
         Destino nuevo;
-        try {
-            String ubicacion = destinoDireccionTxt.getText();
+        String ubicacion = destinoDireccionTxt.getText();
             int codigo = Integer.parseInt(destinoCodigoTxt.getText());
             double cuota = Double.parseDouble(destinoCuotaTxt.getText());
             nuevo = new Destino(codigo, ubicacion, cuota);
-            if (!actualizar && connectionManager.insert(nuevo)) {
-                JOptionPane.showMessageDialog(frameRuta, nuevo.getDireccion() + " Correctamente ingresado");
-                clear(false,6);
-            } //else if (actualizar && connectionManager.update(nuevo, fields, conditions))
-                  
-        } catch (Exception e) {
-        }
+            save(nuevo, null, null, FRAMERUTA);
+//        try {
+//            
+//            if (!actualizar && connectionManager.insert(nuevo)) {
+//                JOptionPane.showMessageDialog(frameRuta, nuevo.getDireccion() + " Correctamente ingresado");
+//                clear(false,6);
+//            } //else if (actualizar && connectionManager.update(nuevo, fields, conditions))
+//                  
+//        } catch (Exception e) {
+//        }
     }//GEN-LAST:event_destinoSaveBtnActionPerformed
+
+    private void paqueteSaveBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_paqueteSaveBtnActionPerformed
+        Paquete nuevo;
+        int codigo = Integer.parseInt((String) paquetePaquetesCombo.getSelectedItem());
+        double peso = Double.parseDouble(paquetePesoTxt.getText());
+        String nit = paqueteNitTxt.getText();
+        boolean priorizado = paquetePriorizadoCheck.isSelected();
+        nuevo = new Paquete(codigo, peso, nit, priorizado);
+        save(nuevo, null, null, FRAMEENVIO);
+//        try {
+//            if (!actualizar && connectionManager.insert(nuevo)) {
+//                JOptionPane.showMessageDialog(framePaquete, nuevo.getCodigo() + " correctamente ingresado");
+//            } else {
+//                JOptionPane.showMessageDialog(rootPane, "Paquete ya ingresado");
+// 
+//            }
+//        } catch (Exception e) {
+//        }
+        
+    }//GEN-LAST:event_paqueteSaveBtnActionPerformed
+
+    private void pcSaveBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pcSaveBtnActionPerformed
+        PuntoControl nuevo;
+        int codigo = Integer.parseInt(pcCodigoTxt.getText()),
+                codRuta = Integer.parseInt(String.valueOf(pcRutaCombo.getSelectedItem())),
+                codDestino = Integer.parseInt(String.valueOf(pcDestinoCombo.getSelectedItem())),
+                limite = Integer.parseInt(String.valueOf(pcLimiteSpinner.getValue()));
+        double tarifa = Double.parseDouble(pcTarifaDeOperacionTxt.getText());
+        String direccion = pcDireccionTxt.getText();
+        
+        nuevo = new PuntoControl(codigo, codRuta, codDestino, tarifa, limite, direccion);
+        save(nuevo, null, null, FRAMEPUNTOCONTROL);
+    }//GEN-LAST:event_pcSaveBtnActionPerformed
+
+    private void rutaSaveBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rutaSaveBtnActionPerformed
+        Ruta nueva;
+        int codigo = Integer.parseInt(rutaCodigoTxt.getText()),
+                codDestino = Integer.parseInt(String.valueOf(rutaCodDestinoCombo.getSelectedItem()));
+        nueva = new Ruta(codigo, codDestino);
+        save(nueva, null, null, FRAMERUTA);
+    }//GEN-LAST:event_rutaSaveBtnActionPerformed
+
+    private void envioGuardarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_envioGuardarBtnActionPerformed
+        Envio nuevo;
+        int codigo = Integer.parseInt(envioCodigoTxt.getText()),
+                codPaquete = Integer.parseInt(String.valueOf(envioCodPaquete.getSelectedItem())),
+                codRuta = Integer.parseInt(String.valueOf(envioCodRutaCombo.getSelectedItem())),
+                codDestino = Integer.parseInt(String.valueOf(envioCodDestinoCombo.getSelectedItem()));
+        nuevo = new Envio(codigo, codPaquete, codRuta, codDestino);
+        save(nuevo, null, null, FRAMEENVIO);
+    }//GEN-LAST:event_envioGuardarBtnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1675,7 +1773,6 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JInternalFrame frameRuta;
     private javax.swing.JInternalFrame frameUsuario;
     private javax.swing.JLabel incorrectValuesLbl;
-    private javax.swing.JButton jButton1;
     private javax.swing.JDesktopPane jDesktopPane1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -1722,7 +1819,6 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
-    private javax.swing.JSpinner jSpinner1;
     private javax.swing.JButton logInBtn;
     private javax.swing.JInternalFrame logInFrame;
     private javax.swing.JTextField logInUsrTxt;
@@ -1735,9 +1831,11 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> paquetePaquetesCombo;
     private javax.swing.JFormattedTextField paquetePesoTxt;
     private javax.swing.JCheckBox paquetePriorizadoCheck;
+    private javax.swing.JButton paqueteSaveBtn;
     private javax.swing.JTextField pcCodigoTxt;
     private javax.swing.JComboBox<String> pcDestinoCombo;
     private javax.swing.JTextField pcDireccionTxt;
+    private javax.swing.JSpinner pcLimiteSpinner;
     private javax.swing.JComboBox<String> pcRutaCombo;
     private javax.swing.JButton pcSaveBtn;
     private javax.swing.JFormattedTextField pcTarifaDeOperacionTxt;

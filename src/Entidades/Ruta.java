@@ -34,7 +34,9 @@ public class Ruta implements Insertable{
             
         }
     }
-
+  public String primaryKey(){
+        return String.valueOf(this.getCodigo());
+    }
         public String insert(){
             return String.format("%d, %d, %d", this.codigo, this.codDestino, this.est);
         }

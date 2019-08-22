@@ -18,7 +18,7 @@ public class Paquete implements Insertable {
     private boolean priorizado; //El paquete esta priorizado?
     private int prior;
 
-    public Paquete(int codigo, int peso, String nit, boolean priorizado) {
+    public Paquete(int codigo, double peso, String nit, boolean priorizado) {
         this.codigo = codigo;
         this.peso = peso;
         this.nit = nit;
@@ -38,7 +38,9 @@ public class Paquete implements Insertable {
         }
     }
     
-    
+      public String primaryKey(){
+        return String.valueOf(this.getCodigo());
+    }
 
         public String insert(){
             return String.format("%d, %f, '%s', %d", this.codigo, this.peso, this.nit, this.prior);

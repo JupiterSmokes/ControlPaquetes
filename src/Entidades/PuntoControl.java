@@ -42,6 +42,9 @@ public class PuntoControl implements Insertable{
     }
     
 
+      public String primaryKey(){
+        return this.getCodigo() + "," +this.getCodRuta()+ "," + this.getCodDestino();
+    }
         public String insert(){
             return String.format("%d, %d, %d, %f, %f, %d, ?, '%s'", this.codigo, this.codRuta, this.codDestino, this.tarifa, this.tarifaG, this.limite, this.ubicacion);
         }

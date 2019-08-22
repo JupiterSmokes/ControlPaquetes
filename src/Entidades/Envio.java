@@ -46,7 +46,9 @@ public class Envio implements Insertable{
         }
     }
 
-    
+      public String primaryKey(){
+        return String.valueOf(this.getCodigo());
+    }
     
         public String insert(){
             return String.format("%d, %d, %d, %d, %f, %f, %d", this.codigo, this.codPaquete, this.codRuta, this.codDestino, this.costoT, this.tiempoT, this.rec);

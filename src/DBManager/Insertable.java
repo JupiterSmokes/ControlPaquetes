@@ -16,4 +16,5 @@ public interface Insertable {
     public String where(String[] fields);
     public String update(String[] fields);
     public String table();
+    public String primaryKey();
 }

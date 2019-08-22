@@ -22,6 +22,9 @@ public class Destino implements Insertable{
         this.cuota = cuota;
     }
 
+      public String primaryKey(){
+        return String.valueOf(this.getDireccion());
+    }
         public String insert(){
             return String.format("%d,'%s',%f", this.codigo, this.direccion, this.cuota);
         }

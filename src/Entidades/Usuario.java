@@ -24,6 +24,9 @@ public class Usuario implements Insertable{
         this.tipo = tipo;
     }
 
+    public String primaryKey(){
+        return this.getUsuario();
+    }
     public String insert(){
         return String.format("'%s','%s','%s',%d", this.usuario, this.password, this.nombre, this.tipo);
     }

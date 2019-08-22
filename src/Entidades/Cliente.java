@@ -15,6 +15,10 @@ public class Cliente implements Insertable{
     private String nombre; //Nombre del cliente
     private String nit; //Numero de identificacion tributaria (Llave primaria)
 
+    
+      public String primaryKey(){
+        return this.getNit();
+    }
         public String insert(){
             return String.format("'%s','%s'", this.nit, this.nombre, this.nombre);
         }

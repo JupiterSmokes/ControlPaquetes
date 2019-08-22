@@ -38,7 +38,9 @@ public class Almacen implements Insertable{
         this.costo = costo;
     }
 
-    
+  public String primaryKey(){
+        return String.valueOf(this.getCodEnvio());
+    }    
 
        public String insert(){
         return String.format("%d, %d, %d, %d, %d, %f, %f", this.codEnvio,
