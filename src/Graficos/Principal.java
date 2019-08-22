@@ -41,8 +41,21 @@ public class Principal extends javax.swing.JFrame {
         signOut();
         actualizar = false;
         connectionManager.connect();
+        fillCombo();
     }
 
+    public void fillCombo(){
+        buscado = new Destino(0, "", 0.00);
+        consulta = connectionManager.select(buscado,new String[] {"Direccion"}, null);
+        try {
+            while (consulta.next()){
+                pcDestinoCombo.addItem(consulta.getString("Direccion"));
+                
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     
     public void clear(boolean all, int frame){
         switch (frame) {
@@ -766,6 +779,11 @@ public class Principal extends javax.swing.JFrame {
         destinoCuotaTxt.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
 
         destinoSaveBtn.setText("Guardar");
+        destinoSaveBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                destinoSaveBtnActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout destinoPanelLayout = new javax.swing.GroupLayout(destinoPanel);
         destinoPanel.setLayout(destinoPanelLayout);
@@ -925,7 +943,7 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(pcTarifaDeOperacionTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(35, 35, 35)
                 .addComponent(pcSaveBtn)
-                .addContainerGap(81, Short.MAX_VALUE))
+                .addContainerGap(85, Short.MAX_VALUE))
         );
 
         frameEnvio.setClosable(true);
@@ -1017,7 +1035,7 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(envioRecibidoCheck))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(envioGuardarBtn)
-                .addContainerGap(74, Short.MAX_VALUE))
+                .addContainerGap(78, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout frameEnvioLayout = new javax.swing.GroupLayout(frameEnvio.getContentPane());
@@ -1121,7 +1139,7 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(almacenTiempoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel35)
                     .addComponent(almacenCostoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 76, Short.MAX_VALUE)
                 .addComponent(almacenGuardarBtn)
                 .addGap(27, 27, 27))
         );
@@ -1504,6 +1522,22 @@ public class Principal extends javax.swing.JFrame {
            }
            
     }//GEN-LAST:event_usrSearchBtnActionPerformed
+
+    private void destinoSaveBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_destinoSaveBtnActionPerformed
+        Destino nuevo;
+        try {
+            String ubicacion = destinoDireccionTxt.getText();
+            int codigo = Integer.parseInt(destinoCodigoTxt.getText());
+            double cuota = Double.parseDouble(destinoCuotaTxt.getText());
+            nuevo = new Destino(codigo, ubicacion, cuota);
+            if (!actualizar && connectionManager.insert(nuevo)) {
+                JOptionPane.showMessageDialog(frameRuta, nuevo.getDireccion() + " Correctamente ingresado");
+                clear(false,6);
+            } //else if (actualizar && connectionManager.update(nuevo, fields, conditions))
+                  
+        } catch (Exception e) {
+        }
+    }//GEN-LAST:event_destinoSaveBtnActionPerformed
 
     /**
      * @param args the command line arguments
