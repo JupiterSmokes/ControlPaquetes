@@ -15,28 +15,28 @@ public class Envio implements Insertable{
     private int codigo;
     private int codPaquete;
     private int codRuta;
-    private int codDestino;
+    private String destino;
     private double costoT;
     private int tiempoT;
     private boolean recibido;
     private int rec;
 
-    public Envio(int codigo, int codPaquete, int codRuta, int codDestino) {
+    public Envio(int codigo, int codPaquete, int codRuta, String destino) {
         this.codigo = codigo;
         this.codPaquete = codPaquete;
         this.codRuta = codRuta;
-        this.codDestino = codDestino;
+        this.destino = destino;
         this.costoT = 0;
         this.tiempoT = 0;
         this.recibido = false;
         this.rec = this.recibido? 1:0;
     }
 
-    public Envio(int codigo, int codPaquete, int codRuta, int codDestino, double costoT, int tiempoT, int rec) {
+    public Envio(int codigo, int codPaquete, int codRuta, String destino, double costoT, int tiempoT, int rec) {
         this.codigo = codigo;
         this.codPaquete = codPaquete;
         this.codRuta = codRuta;
-        this.codDestino = codDestino;
+        this.destino = destino;
         this.costoT = costoT;
         this.tiempoT = tiempoT;
         this.rec = rec;
@@ -51,7 +51,7 @@ public class Envio implements Insertable{
     }
     
         public String insert(){
-            return String.format("%d, %d, %d, %d, %f, %f, %d", this.codigo, this.codPaquete, this.codRuta, this.codDestino, this.costoT, this.tiempoT, this.rec);
+            return String.format("%d, %d, %d, '%s', %f, %f, %d", this.codigo, this.codPaquete, this.codRuta, this.destino, this.costoT, (double) this.tiempoT, this.rec);
         }
         
         public String update(String[] fields){
@@ -68,7 +68,7 @@ public class Envio implements Insertable{
                        update += ", CodRuta = " + this.codRuta;
                        break;
                    case "coddestino": 
-                       update += ", CodDestino = " + this.codDestino;
+                       update += ", Destino = '" + this.destino + "'";
                        break;
                    case "tiempot": 
                        update += ", TiempoT = " + this.tiempoT;
@@ -99,7 +99,7 @@ public class Envio implements Insertable{
                        select += ", CodRuta";
                        break;
                    case "coddestino": 
-                       select += ", CodDestino";
+                       select += ", Destino";
                        break;
                    case "tiempot": 
                        select += ", TiempoT";
@@ -132,7 +132,7 @@ public class Envio implements Insertable{
                        condition += "AND CodRuta = " + this.codRuta;
                        break;
                    case "coddestino": 
-                       condition += "AND CodDestino = " + this.codDestino;
+                       condition += "AND Destino = '" + this.destino + "'";
                        break;
                    case "tiempot": 
                        condition += "AND TiempoT = " + this.tiempoT;
@@ -177,11 +177,11 @@ public class Envio implements Insertable{
         this.codRuta = codRuta;
     }
 
-    public int getCodDestino() {
-        return codDestino;
+    public String getDestino() {
+        return destino;
     }
-    public void setCodDestino(int codDestino) {
-        this.codDestino = codDestino;
+    public void setDestino(String destino) {
+        this.destino = destino;
     }
 
     public double getCostoT() {

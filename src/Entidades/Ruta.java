@@ -13,20 +13,20 @@ import DBManager.Insertable;
  */
 public class Ruta implements Insertable{
     private int codigo; //Codigo de ruta (Llave primaria)
-    private int codDestino; //Codigo del destino al que lleva (Llave primaria y foranea)
+    private String destino; //Codigo del destino al que lleva (Llave primaria y foranea)
     private boolean estado; //Esta activa?
     private int est;
 
-    public Ruta(int codigo, int codDestino) {
+    public Ruta(int codigo, String destino) {
         this.codigo = codigo;
-        this.codDestino = codDestino;
+        this.destino = destino;
         this.estado = true;
         est = this.estado? 1:0;
     }
 
-    public Ruta(int codigo, int codDestino, int est) {
+    public Ruta(int codigo, String destino, int est) {
         this.codigo = codigo;
-        this.codDestino = codDestino;
+        this.destino = destino;
         this.est = est;
         switch (this.est){
             case 1: this.estado = true; break;
@@ -38,7 +38,7 @@ public class Ruta implements Insertable{
         return String.valueOf(this.getCodigo());
     }
         public String insert(){
-            return String.format("%d, %d, %d", this.codigo, this.codDestino, this.est);
+            return String.format("%d, '%s', %d", this.codigo, this.destino, this.est);
         }
         
             public String update(String[] fields){
@@ -48,8 +48,8 @@ public class Ruta implements Insertable{
                case "codigo": 
                    update += ", Codigo = " + this.codigo;
                    break;
-               case "coddestino": 
-                   update += ", CodDestino = " + this.codDestino;
+               case "destino": 
+                   update += ", Destino = '" + this.destino + "'";
                    break;
                case "estado": 
                    update += ", Estado = " + this.estado;
@@ -87,8 +87,8 @@ public class Ruta implements Insertable{
                case "codigo": 
                    condition += "AND Codigo = " + this.codigo;
                    break;
-               case "coddestino": 
-                   condition += "AND CodDestino = " + this.codDestino;
+               case "destino": 
+                   condition += "AND Destino = '" + this.destino + "'";
                    break;
                case "estado": 
                    condition += "AND Estado = " + this.estado;
@@ -111,11 +111,11 @@ public class Ruta implements Insertable{
         this.codigo = codigo;
     }
 
-    public int getCodDestino() {
-        return codDestino;
+    public String getDestino() {
+        return destino;
     }
-    public void setCodDestino(int codDestino) {
-        this.codDestino = codDestino;
+    public void setDestino(String destino) {
+        this.destino = destino;
     }
 
     public boolean isEstado() {

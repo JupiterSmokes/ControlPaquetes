@@ -13,26 +13,27 @@ import DBManager.Insertable;
  */
 public class Almacen implements Insertable{
     private int codEnvio;
-    private int codPC, codRuta, codDestino;
+    private int codPC, codRuta;
+    private String destino;
     private int tiempo;
     private double tarifaA;
     private double costo;
 
-    public Almacen(int codEnvio, int codPC, int codRuta, int codDestino, double tarifaA) {
+    public Almacen(int codEnvio, int codPC, int codRuta, String destino, double tarifaA) {
         this.codEnvio = codEnvio;
         this.codPC = codPC;
         this.codRuta = codRuta;
-        this.codDestino = codDestino;
+        this.destino = destino;
         this.tiempo = 0;
         this.tarifaA = tarifaA;
         this.costo = 0;
     }
 
-    public Almacen(int codEnvio, int codPC, int codRuta, int codDestino, int tiempo, double tarifaA, double costo) {
+    public Almacen(int codEnvio, int codPC, int codRuta, String destino, int tiempo, double tarifaA, double costo) {
         this.codEnvio = codEnvio;
         this.codPC = codPC;
         this.codRuta = codRuta;
-        this.codDestino = codDestino;
+        this.destino = destino;
         this.tiempo = tiempo;
         this.tarifaA = tarifaA;
         this.costo = costo;
@@ -43,8 +44,8 @@ public class Almacen implements Insertable{
     }    
 
        public String insert(){
-        return String.format("%d, %d, %d, %d, %d, %f, %f", this.codEnvio,
-                this.codPC, this.codRuta, this.codDestino,this.tiempo,
+        return String.format("%d, %d, %d, '%s', %d, %f, %f", this.codEnvio,
+                this.codPC, this.codRuta, this.destino,this.tiempo,
                 this.tarifaA, this.costo);
     }
         public String update(String[] fields){
@@ -61,7 +62,7 @@ public class Almacen implements Insertable{
                    update += ", CodRuta = " + this.codRuta;
                    break;
                case "coddestino": 
-                   update += ", CodDestino = " + this.codDestino;
+                   update += ", Destino = '" + this.destino + "'";
                    break;
                case "tiempo": 
                    update += ", Tiempo = " + this.tiempo;
@@ -92,7 +93,7 @@ public class Almacen implements Insertable{
                    select += ", CodRuta";
                    break;
                case "coddestino": 
-                   select += ", CodDestino";
+                   select += ", Destino";
                    break;
                case "tiempo": 
                    select += ", Tiempo";
@@ -125,7 +126,7 @@ public class Almacen implements Insertable{
                    condition += " AND CodRuta = " + this.codRuta;
                    break;
                case "coddestino": 
-                   condition += " AND CodDestino = " + this.codDestino;
+                   condition += " AND Destino = '" + this.destino + "'";
                    break;
                case "Tiempo": 
                    condition += " AND Tiempo = " + this.tiempo;
@@ -183,6 +184,22 @@ public class Almacen implements Insertable{
     }
     public void setCosto(int costo) {
         this.costo = costo;
+    }
+
+    public int getCodRuta() {
+        return codRuta;
+    }
+
+    public void setCodRuta(int codRuta) {
+        this.codRuta = codRuta;
+    }
+
+    public String getDestino() {
+        return destino;
+    }
+
+    public void setDestino(String destino) {
+        this.destino = destino;
     }
 
    

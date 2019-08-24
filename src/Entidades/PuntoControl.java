@@ -14,27 +14,27 @@ import DBManager.Insertable;
 public class PuntoControl implements Insertable{
     private int codigo; //Codigo de identificacion del punto de control (Llave primaria)
     private int codRuta;  //Codigo de la ruta (Llave primaria y foranea)
-    private int codDestino; //Codigo del destino (Llave primaria ruta y foranea)
+    private String destino; //Codigo del destino (Llave primaria ruta y foranea)
     private double tarifa; //Tarifa de operacion del PC
     private double tarifaG; //Tarifa global de PCs
     private int limite; //Limite de paquetes en el PC
     //private cola (Tal vez implementada personalmente)
     private String ubicacion; //Ubicacion del PC
 
-    public PuntoControl(int codigo, int codRuta, int codDestino, double tarifa, int limite, String ubicacion) {
+    public PuntoControl(int codigo, int codRuta, String destino, double tarifa, int limite, String ubicacion) {
         this.codigo = codigo;
         this.codRuta = codRuta;
-        this.codDestino = codDestino;
+        this.destino = destino;
         this.tarifa = tarifa;
         this.limite = limite;
         this.ubicacion = ubicacion;
         //crear cola con limite = limite
     }
 
-    public PuntoControl(int codigo, int codRuta, int codDestino, double tarifa, double tarifaG, int limite, String ubicacion) {
+    public PuntoControl(int codigo, int codRuta, String destino, double tarifa, double tarifaG, int limite, String ubicacion) {
         this.codigo = codigo;
         this.codRuta = codRuta;
-        this.codDestino = codDestino;
+        this.destino = destino;
         this.tarifa = tarifa;
         this.tarifaG = tarifaG;
         this.limite = limite;
@@ -43,10 +43,10 @@ public class PuntoControl implements Insertable{
     
 
       public String primaryKey(){
-        return this.getCodigo() + "," +this.getCodRuta()+ "," + this.getCodDestino();
+        return this.getCodigo() + "," +this.getCodRuta()+ "," + this.getDestino();
     }
         public String insert(){
-            return String.format("%d, %d, %d, %f, %f, %d, ?, '%s'", this.codigo, this.codRuta, this.codDestino, this.tarifa, this.tarifaG, this.limite, this.ubicacion);
+            return String.format("%d, %d, '%s', %f, %f, %d, '%s'", this.codigo, this.codRuta, this.destino, this.tarifa, this.tarifaG, this.limite, this.ubicacion);
         }
          
         public String update(String[] fields){
@@ -63,7 +63,7 @@ public class PuntoControl implements Insertable{
                        update += ", CodRuta = " + this.codRuta;
                        break;
                    case "coddestino": 
-                       update += ", CodDestino = " + this.codDestino;
+                       update += ", Destino = '" + this.destino + "'";
                        break;
                    case "tarifag": 
                        update += ", TarifaG = " + this.tarifaG;
@@ -127,7 +127,7 @@ public class PuntoControl implements Insertable{
                        condition += "AND CodRuta = " + this.codRuta;
                        break;
                    case "coddestino": 
-                       condition += "AND CodDestino = " + this.codDestino;
+                       condition += "AND Destino = '" + this.destino + "'";
                        break;
                    case "tarifag": 
                        condition += "AND TarifaG = " + this.tarifaG;
@@ -185,11 +185,11 @@ public class PuntoControl implements Insertable{
         this.ubicacion = ubicacion;
     }
 
-    public int getCodDestino() {
-        return codDestino;
+    public String getDestino() {
+        return destino;
     }
-    public void setCodDestino(int codDestino) {
-        this.codDestino = codDestino;
+    public void setDestino(String destino) {
+        this.destino = destino;
     }
 
     public double getTarifaG() {

@@ -12,13 +12,11 @@ import DBManager.Insertable;
  * @author DANIEL
  */
 public class Destino implements Insertable{
-    private int codigo; //Codigo del destino (Llave primaria)
     private String direccion; //Ubicacion del destino
     private double cuota; //Precio de envio hacia el destino
 
-    public Destino(int codigo, String direccion, double cuota) {
-        this.codigo = codigo;
-        this.direccion = direccion;
+    public Destino(String direccion, double cuota) {
+       this.direccion = direccion;
         this.cuota = cuota;
     }
 
@@ -26,7 +24,7 @@ public class Destino implements Insertable{
         return String.valueOf(this.getDireccion());
     }
         public String insert(){
-            return String.format("%d,'%s',%f", this.codigo, this.direccion, this.cuota);
+            return String.format("'%s',%f", this.direccion, this.cuota);
         }
          @Override
         public String table() {
@@ -39,9 +37,6 @@ public class Destino implements Insertable{
             switch (field.toLowerCase()) {
                case "direccion": 
                    update += ", Direccion = '" + this.direccion + "'";
-                   break;
-               case "codigo": 
-                   update += ", Codigo = " + this.codigo;
                    break;
                case "cuota": 
                    update += ", Cuota = " + this.cuota;
@@ -58,9 +53,6 @@ public class Destino implements Insertable{
             switch (field.toLowerCase()) {
                case "direccion": 
                    select += ", Direccion";
-                   break;
-               case "codigo": 
-                   select += ", Codigo";
                    break;
                case "cuota": 
                    select += ", Cuota";
@@ -80,9 +72,6 @@ public class Destino implements Insertable{
                 case "direccion": 
                    condition += "AND Direccion = '" + this.direccion + "'";
                    break;
-               case "codigo": 
-                   condition += "AND Codigo = " + this.codigo;
-                   break;
                case "cuota": 
                    condition += "AND Cuota = " + this.cuota;
                    break;
@@ -96,13 +85,6 @@ public class Destino implements Insertable{
         }
          condition = condition.replaceFirst("AND", "");
         return condition;
-    }
-        
-    public int getCodigo() {
-        return codigo;
-    }
-    public void setCodigo(int codigo) {
-        this.codigo = codigo;
     }
 
     public String getDireccion() {

@@ -41,6 +41,7 @@ public class connectionManager {
     public static void close(){
         try {
             connection.close();
+            System.out.println("Sesion finalizada");
         } catch (SQLException ex) {
             Logger.getLogger(connectionManager.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -65,10 +66,17 @@ public class connectionManager {
     
     public static ResultSet select(String table, String fields, String conditions){
         result = null;
-        String selectStatement = "SELECT " + fields + " FROM " + table + " WHERE " + conditions;
+        String sql = "SELECT %s FROM %s";
+        if (conditions != null) {
+            sql += " WHERE %s";
+            sql = String.format(sql, fields, table, conditions);
+        }else {
+            sql = String.format(sql, fields, table);
+        }
+        System.out.println(sql);
         try {
-            PreparedStatement preparedSelect = connection.prepareStatement(selectStatement, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            if (checkStatement(selectStatement)) {
+            PreparedStatement preparedSelect = connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            if (checkStatement(sql)) {
                 result = preparedSelect.executeQuery();
                 return result;
             }
@@ -96,7 +104,8 @@ public class connectionManager {
                 return result;
             }
            
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
+            ex.printStackTrace();
             Logger.getLogger(connectionManager.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
@@ -113,7 +122,7 @@ public class connectionManager {
             return true;
         } catch (Exception e) {
             System.out.println("Incorrecto " + sql);
-           // e.printStackTrace();
+           //e.printStackTrace();
             return false;
         } 
     }
@@ -127,8 +136,9 @@ public class connectionManager {
             System.out.println("Correcto " + sql);
             connection.commit();
         } catch (Exception e) {
-            System.out.println("Incorrecto " + sql);
             e.printStackTrace();
+            System.out.println("Incorrecto " + sql);
+            
         } 
     }
     
