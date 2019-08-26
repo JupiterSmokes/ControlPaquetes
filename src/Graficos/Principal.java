@@ -6,14 +6,19 @@
 package Graficos;
 import Entidades.*;
 import DBManager.*;
+import Funciones.*;
 import java.awt.Image;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import org.jdesktop.observablecollections.ObservableCollections;
+import org.jdesktop.observablecollections.ObservableList;
 /**
  *
  * @author DANIEL
@@ -23,6 +28,11 @@ public class Principal extends javax.swing.JFrame {
     private Insertable buscado;
     private ResultSet consulta;
     private boolean actualizar;
+    
+    private List encontrados;
+     private ObservableList tablaEncontrados;
+     private List recuperar;
+    
     public static final int LOGINFRAME = 0,
                     FRAMEALMACEN = 1,
                     FRAMECLIENTE = 2,
@@ -36,22 +46,77 @@ public class Principal extends javax.swing.JFrame {
      * Creates new form Principal
      */
     public Principal() {        
+        encontrados = new ArrayList<>();
+        tablaEncontrados = ObservableCollections.observableList(encontrados);
         initComponents();
         incorrectValuesLbl.setVisible(false);
         usrShowPassBtn.setIcon(new ImageIcon(((new ImageIcon(getClass().getResource("/Graficos/eye.png"))).getImage().getScaledInstance(usrShowPassBtn.getWidth(), usrShowPassBtn.getHeight(), Image.SCALE_SMOOTH))));
         signOut();
         actualizar = false;
         connectionManager.connect();
+        fillTable();
 //        fillCombo();
     }
+    
+      public void actualizarLista(List listado) {
+        this.tablaEncontrados.clear();
+        this.tablaEncontrados.addAll(listado);
+    }
 
+    //metodo que entiende la tabla para llenar su informacion
+    public ObservableList getEncontrados() {
+        return tablaEncontrados;
+    }
+
+    //cambia la informacion de la tabla
+    public void setListaObservableDatos(ObservableList listaDatos) {
+        this.tablaEncontrados = listaDatos;
+    }
+
+    public void fillTable(){
+//        buscado = new Ruta(0,"");
+//        consulta = connectionManager.select((Ruta)buscado, funciones.fields("*"),null);
+//        
+//        recuperar = funciones.recuperar((Ruta) buscado, consulta);
+//        encontrados = recuperar;
+//        actualizarLista(encontrados);
+        funciones.fillTable(tablaRutaYPaquetes, funciones.fields("No Paquetes, Ruta, Destino, Ruta Activa, Recibido") , null);
+        ResultSet count;
+        consulta = connectionManager.query("SELECT Envio.Recibido, Ruta.*" +
+            " FROM Envio" +
+            " INNER JOIN Ruta" +
+            " WHERE Envio.CodRuta = Ruta.Codigo AND Envio.Destino = Ruta.Destino");
+        try {
+            while (consulta.next()) {
+                count = connectionManager.query("SELECT COUNT(Envio.CodPaquete) "
+                            + "FROM Envio"
+                        + " WHERE Envio.Destino = '" + consulta.getString(3) + "'"
+                                + " AND Envio.CodRuta = " + consulta.getInt(2));
+                count.first(); 
+                Object[] data = {
+//                    consulta.getInt(1),
+                    count.getInt(1),
+                    consulta.getInt(2),
+                    consulta.getString(3),
+                    (consulta.getInt(4)==1),
+                    (consulta.getInt(1)==1)
+                };
+                 
+                funciones.addRow(tablaRutaYPaquetes, data);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    
     public void fillCombo(String[]  condititions, Insertable obj, JComboBox combo){ 
         try {
          switch (obj.getClass().getSimpleName()){
              case "Paquete":
                  envioCodPaqueteCombo.removeAllItems();
                  envioCodPaqueteCombo.addItem("Default"); //Paquete
-                 consulta = connectionManager.select(obj, fields("Codigo"), condititions);
+                 consulta = connectionManager.select(obj, funciones.fields("Codigo"), condititions);
                  while (consulta.next()){
                      combo.addItem(consulta.getInt("Codigo"));
                  }
@@ -62,7 +127,7 @@ public class Principal extends javax.swing.JFrame {
                  envioCodRutaCombo.addItem("Default"); //Ruta
                  pcRutaCombo.addItem("Default"); //Ruta
          
-                 consulta = connectionManager.select(obj, fields("Codigo"), condititions);
+                 consulta = connectionManager.select(obj, funciones.fields("Codigo"), condititions);
                  while (consulta.next()){
                      combo.addItem(consulta.getInt("Codigo"));
                  }
@@ -70,7 +135,7 @@ public class Principal extends javax.swing.JFrame {
                  case "Envio":
                      almacenCodEnvioCombo.removeAllItems();
                      almacenCodEnvioCombo.addItem("Default"); //Envio
-                 consulta = connectionManager.select(obj, fields("Codigo"), condititions);
+                 consulta = connectionManager.select(obj, funciones.fields("Codigo"), condititions);
                  while (consulta.next()){
                      combo.addItem(consulta.getInt("Codigo"));
                  }
@@ -83,7 +148,7 @@ public class Principal extends javax.swing.JFrame {
                      pcDestinoCombo.addItem("Default"); //Destino
                      rutaCodDestinoCombo.addItem("Default"); //Destino
  
-                 consulta = connectionManager.select(obj, fields("Direcion"), condititions);
+                 consulta = connectionManager.select(obj, funciones.fields("Direcion"), condititions);
                  while (consulta.next()){
                      combo.addItem(consulta.getString("Direccion"));
                  }
@@ -91,7 +156,7 @@ public class Principal extends javax.swing.JFrame {
                   case "Cliente":   
                       paqueteClienteCombo.removeAllItems();
                       paqueteClienteCombo.addItem("Default"); //Paquete
-                 consulta = connectionManager.select(obj, fields("NIT"), condititions);
+                 consulta = connectionManager.select(obj, funciones.fields("NIT"), condititions);
                  while (consulta.next()){
                      combo.addItem(consulta.getString("Nit"));
                  }
@@ -99,7 +164,7 @@ public class Principal extends javax.swing.JFrame {
                   case "PuntoControl":
                       almacenCodPCCombo.removeAllItems();
                       almacenCodPCCombo.addItem("Default"); //PC
-                      consulta = connectionManager.select(obj, fields("NIT"), condititions);
+                      consulta = connectionManager.select(obj, funciones.fields("NIT"), condititions);
                  while (consulta.next()){
                      combo.addItem(consulta.getString("Nit"));
                  }
@@ -146,11 +211,7 @@ public class Principal extends javax.swing.JFrame {
 //            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
 //        }
     }
-    
-    public String[] fields(String fields){
-        return fields.split(",");
-    }
-    
+
     public void clear(boolean all, int frame){
         switch (frame) {
             case LOGINFRAME:
@@ -168,7 +229,7 @@ public class Principal extends javax.swing.JFrame {
                 
                 almacenCostoTxt.setText("");
                 almacenTarifaTxt.setText("");
-                almacenTiempoTxt.setText("");
+                almacenCostoTxt.setText("");
                 if (!all) break;
             case FRAMECLIENTE:
                 //        frameCliente = 2
@@ -244,7 +305,7 @@ public class Principal extends javax.swing.JFrame {
         try {   
 //            if (!connectionManager.select(table, table, table+" = '"+usr+"'").isBeforeFirst()) {
                 if (!actualizar && connectionManager.insert(nuevo)){
-                    JOptionPane.showMessageDialog(almacenTiempoTxt, nuevo.primaryKey() + " Correctamente Ingresado");
+                    JOptionPane.showMessageDialog(almacenCostoTxt, nuevo.primaryKey() + " Correctamente Ingresado");
                     clear(false, frame);
                // consulta = connectionManager.select(nuevo, new String[] {"*"}, null);
             } else if (actualizar && connectionManager.update(nuevo, fields, conditions)){
@@ -260,7 +321,7 @@ public class Principal extends javax.swing.JFrame {
     }
     
     public Insertable recuperar(ResultSet recuperado, String table){
-         Insertable buscado;
+         Insertable buscado = null;
         try {
             switch (table.toLowerCase()){
              case "almacen":
@@ -275,7 +336,7 @@ public class Principal extends javax.swing.JFrame {
                     break;
              case "cliente":
                  buscado = new Cliente(recuperado.getString("Nombre")
-                        , consulta.getString("Nit"));
+                        , recuperado.getString("Nit"));
                  break;
              case "destino":
                     buscado = new Destino(recuperado.getString("Direccion"),
@@ -325,10 +386,9 @@ public class Principal extends javax.swing.JFrame {
              default:
                  buscado = null;
             }
-            return buscado;
         } catch (Exception e) {
         }
-        return null;
+        return buscado;
     }
     
     /**
@@ -339,6 +399,7 @@ public class Principal extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         jPanel1 = new javax.swing.JPanel();
         jDesktopPane1 = new javax.swing.JDesktopPane();
@@ -429,19 +490,28 @@ public class Principal extends javax.swing.JFrame {
         envioGuardarBtn = new javax.swing.JButton();
         envioBuscarBtn = new javax.swing.JButton();
         frameAlmacen = new javax.swing.JInternalFrame();
-        jPanel7 = new javax.swing.JPanel();
+        almacenPanelInfo = new javax.swing.JPanel();
         almacenCodEnvioCombo = new javax.swing.JComboBox<>();
         jLabel32 = new javax.swing.JLabel();
         jLabel33 = new javax.swing.JLabel();
         almacenCodPCCombo = new javax.swing.JComboBox<>();
-        jLabel34 = new javax.swing.JLabel();
         almacenTarifaTxt = new javax.swing.JTextField();
-        almacenTiempoTxt = new javax.swing.JFormattedTextField();
-        jLabel35 = new javax.swing.JLabel();
-        almacenCostoTxt = new javax.swing.JTextField();
-        almacenGuardarBtn = new javax.swing.JButton();
         almacenCodDestino = new javax.swing.JTextField();
         almacenCodRuta = new javax.swing.JTextField();
+        almacenPanelSave = new javax.swing.JPanel();
+        almacenCostoTxt = new javax.swing.JFormattedTextField();
+        jLabel34 = new javax.swing.JLabel();
+        jLabel35 = new javax.swing.JLabel();
+        almacenGuardarBtn = new javax.swing.JButton();
+        almacenTiempoSpin = new javax.swing.JSpinner();
+        jInternalFrame1 = new javax.swing.JInternalFrame();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel7 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tablaRutaYPaquetes = new javax.swing.JTable();
+        jPanel8 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
         menuAdministradorFile = new javax.swing.JMenu();
         administradorMenuModificar = new javax.swing.JMenu();
@@ -456,6 +526,8 @@ public class Principal extends javax.swing.JFrame {
         recepcionistaMenuCliente = new javax.swing.JMenuItem();
         recepcionistaPaqueteMenu = new javax.swing.JMenuItem();
         recepcionistaMenuEnvio = new javax.swing.JMenuItem();
+        administradorMenuVer = new javax.swing.JMenu();
+        administradorMenuReportes = new javax.swing.JMenuItem();
         sesionMenu = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
@@ -1037,13 +1109,9 @@ public class Principal extends javax.swing.JFrame {
             framePuntoControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(framePuntoControlLayout.createSequentialGroup()
                 .addGap(17, 17, 17)
-                .addGroup(framePuntoControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(framePuntoControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(framePuntoControlLayout.createSequentialGroup()
                         .addGroup(framePuntoControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(framePuntoControlLayout.createSequentialGroup()
-                                .addComponent(jLabel25)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(pcLimiteSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(framePuntoControlLayout.createSequentialGroup()
                                 .addComponent(jLabel21)
                                 .addGap(18, 18, 18)
@@ -1065,7 +1133,12 @@ public class Principal extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addGroup(framePuntoControlLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(pcSaveBtn)
-                            .addComponent(pcTarifaDeOperacionTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(pcTarifaDeOperacionTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(framePuntoControlLayout.createSequentialGroup()
+                        .addComponent(jLabel25)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(pcLimiteSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(136, 136, 136)))
                 .addContainerGap(38, Short.MAX_VALUE))
         );
         framePuntoControlLayout.setVerticalGroup(
@@ -1093,7 +1166,7 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(pcTarifaDeOperacionTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(35, 35, 35)
                 .addComponent(pcSaveBtn)
-                .addContainerGap(31, Short.MAX_VALUE))
+                .addContainerGap(60, Short.MAX_VALUE))
         );
 
         frameEnvio.setClosable(true);
@@ -1203,7 +1276,7 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(envioRecibidoCheck))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(envioGuardarBtn)
-                .addContainerGap(55, Short.MAX_VALUE))
+                .addContainerGap(43, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout frameEnvioLayout = new javax.swing.GroupLayout(frameEnvio.getContentPane());
@@ -1243,79 +1316,99 @@ public class Principal extends javax.swing.JFrame {
 
         almacenCodPCCombo.setEditable(true);
         almacenCodPCCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
-        jLabel34.setText("Tiempo");
+        almacenCodPCCombo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                almacenCodPCComboActionPerformed(evt);
+            }
+        });
 
         almacenTarifaTxt.setText("Tarifa");
 
-        almacenTiempoTxt.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("+#,##0"))));
-
-        jLabel35.setText("Costo");
-
-        almacenGuardarBtn.setText("Guardar");
-
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
+        javax.swing.GroupLayout almacenPanelInfoLayout = new javax.swing.GroupLayout(almacenPanelInfo);
+        almacenPanelInfo.setLayout(almacenPanelInfoLayout);
+        almacenPanelInfoLayout.setHorizontalGroup(
+            almacenPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(almacenPanelInfoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel7Layout.createSequentialGroup()
+                .addGroup(almacenPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(almacenPanelInfoLayout.createSequentialGroup()
                         .addComponent(jLabel32)
                         .addGap(30, 30, 30)
                         .addComponent(almacenCodEnvioCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel7Layout.createSequentialGroup()
-                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel7Layout.createSequentialGroup()
-                                .addComponent(jLabel34)
-                                .addGap(18, 18, 18)
-                                .addComponent(almacenTiempoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel7Layout.createSequentialGroup()
-                                .addComponent(jLabel33)
-                                .addGap(18, 18, 18)
-                                .addComponent(almacenCodDestino, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel7Layout.createSequentialGroup()
-                                .addGap(34, 34, 34)
-                                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel7Layout.createSequentialGroup()
-                                        .addComponent(jLabel35)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(almacenCostoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(almacenGuardarBtn)))
-                            .addGroup(jPanel7Layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addComponent(almacenCodRuta, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(37, 37, 37)
-                                .addComponent(almacenCodPCCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(almacenTarifaTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(20, Short.MAX_VALUE))
+                    .addGroup(almacenPanelInfoLayout.createSequentialGroup()
+                        .addComponent(jLabel33)
+                        .addGap(18, 18, 18)
+                        .addComponent(almacenCodDestino, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(almacenCodRuta, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(37, 37, 37)
+                        .addComponent(almacenCodPCCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(almacenTarifaTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(25, Short.MAX_VALUE))
         );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
+        almacenPanelInfoLayout.setVerticalGroup(
+            almacenPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(almacenPanelInfoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(almacenPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(almacenCodEnvioCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel32))
                 .addGap(18, 18, 18)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(almacenPanelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel33)
                     .addComponent(almacenCodPCCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(almacenTarifaTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(almacenCodDestino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(almacenCodRuta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addContainerGap(63, Short.MAX_VALUE))
+        );
+
+        almacenCostoTxt.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#,###.00"))));
+
+        jLabel34.setText("Tiempo");
+
+        jLabel35.setText("Costo");
+
+        almacenGuardarBtn.setText("Guardar");
+        almacenGuardarBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                almacenGuardarBtnActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout almacenPanelSaveLayout = new javax.swing.GroupLayout(almacenPanelSave);
+        almacenPanelSave.setLayout(almacenPanelSaveLayout);
+        almacenPanelSaveLayout.setHorizontalGroup(
+            almacenPanelSaveLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(almacenPanelSaveLayout.createSequentialGroup()
+                .addGroup(almacenPanelSaveLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(almacenPanelSaveLayout.createSequentialGroup()
+                        .addGap(51, 51, 51)
+                        .addComponent(jLabel34)
+                        .addGap(18, 18, 18)
+                        .addComponent(almacenTiempoSpin, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(109, 109, 109)
+                        .addComponent(jLabel35)
+                        .addGap(18, 18, 18)
+                        .addComponent(almacenCostoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(almacenPanelSaveLayout.createSequentialGroup()
+                        .addGap(251, 251, 251)
+                        .addComponent(almacenGuardarBtn)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        almacenPanelSaveLayout.setVerticalGroup(
+            almacenPanelSaveLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(almacenPanelSaveLayout.createSequentialGroup()
+                .addGap(38, 38, 38)
+                .addGroup(almacenPanelSaveLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel34)
-                    .addComponent(almacenTiempoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(almacenCostoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel35)
-                    .addComponent(almacenCostoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 57, Short.MAX_VALUE)
+                    .addComponent(almacenTiempoSpin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
                 .addComponent(almacenGuardarBtn)
-                .addGap(27, 27, 27))
+                .addContainerGap(62, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout frameAlmacenLayout = new javax.swing.GroupLayout(frameAlmacen.getContentPane());
@@ -1324,14 +1417,102 @@ public class Principal extends javax.swing.JFrame {
             frameAlmacenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(frameAlmacenLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(frameAlmacenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(almacenPanelInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(almacenPanelSave, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         frameAlmacenLayout.setVerticalGroup(
             frameAlmacenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(frameAlmacenLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(almacenPanelInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(almacenPanelSave, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(53, 53, 53))
+        );
+
+        jInternalFrame1.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
+        jInternalFrame1.setIconifiable(true);
+        jInternalFrame1.setVisible(true);
+
+        jTabbedPane1.setTabPlacement(javax.swing.JTabbedPane.LEFT);
+
+        org.jdesktop.beansbinding.ELProperty eLProperty = org.jdesktop.beansbinding.ELProperty.create("${encontrados}");
+        org.jdesktop.swingbinding.JTableBinding jTableBinding = org.jdesktop.swingbinding.SwingBindings.createJTableBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, eLProperty, tablaRutaYPaquetes);
+        org.jdesktop.swingbinding.JTableBinding.ColumnBinding columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${codigo}"));
+        columnBinding.setColumnName("Codigo");
+        columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${destino}"));
+        columnBinding.setColumnName("Destino");
+        bindingGroup.addBinding(jTableBinding);
+        jTableBinding.bind();
+        jScrollPane1.setViewportView(tablaRutaYPaquetes);
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(83, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("tab1", jPanel7);
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane2.setViewportView(jTable1);
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 452, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(51, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("tab2", jPanel8);
+
+        javax.swing.GroupLayout jInternalFrame1Layout = new javax.swing.GroupLayout(jInternalFrame1.getContentPane());
+        jInternalFrame1.getContentPane().setLayout(jInternalFrame1Layout);
+        jInternalFrame1Layout.setHorizontalGroup(
+            jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jInternalFrame1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jTabbedPane1)
+                .addContainerGap())
+        );
+        jInternalFrame1Layout.setVerticalGroup(
+            jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jInternalFrame1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1343,6 +1524,7 @@ public class Principal extends javax.swing.JFrame {
         jDesktopPane1.setLayer(framePuntoControl, javax.swing.JLayeredPane.DEFAULT_LAYER);
         jDesktopPane1.setLayer(frameEnvio, javax.swing.JLayeredPane.DEFAULT_LAYER);
         jDesktopPane1.setLayer(frameAlmacen, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jDesktopPane1.setLayer(jInternalFrame1, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         javax.swing.GroupLayout jDesktopPane1Layout = new javax.swing.GroupLayout(jDesktopPane1);
         jDesktopPane1.setLayout(jDesktopPane1Layout);
@@ -1356,7 +1538,9 @@ public class Principal extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(logInFrame, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(frameUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(frameUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jInternalFrame1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jDesktopPane1Layout.createSequentialGroup()
                         .addGroup(jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(framePuntoControl)
@@ -1367,18 +1551,23 @@ public class Principal extends javax.swing.JFrame {
                         .addGroup(jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(frameEnvio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(frameAlmacen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(263, Short.MAX_VALUE))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
         jDesktopPane1Layout.setVerticalGroup(
             jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jDesktopPane1Layout.createSequentialGroup()
-                .addGap(21, 21, 21)
-                .addGroup(jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(framePaquete, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(logInFrame, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE))
-                    .addComponent(frameUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 289, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addGroup(jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jDesktopPane1Layout.createSequentialGroup()
+                        .addGap(21, 21, 21)
+                        .addGroup(jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(framePaquete, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(logInFrame, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE))
+                            .addComponent(frameUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 289, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDesktopPane1Layout.createSequentialGroup()
+                        .addGap(31, 31, 31)
+                        .addComponent(jInternalFrame1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(571, 571, 571)
                 .addGroup(jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jDesktopPane1Layout.createSequentialGroup()
                         .addComponent(frameRuta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1387,13 +1576,14 @@ public class Principal extends javax.swing.JFrame {
                         .addGroup(jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jDesktopPane1Layout.createSequentialGroup()
                                 .addComponent(frameEnvio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(111, 111, 111)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
                                 .addComponent(frameAlmacen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jDesktopPane1Layout.createSequentialGroup()
                                 .addComponent(frameCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(framePuntoControl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap(107, Short.MAX_VALUE))))
+                                .addComponent(framePuntoControl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(233, 233, 233))))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -1490,6 +1680,13 @@ public class Principal extends javax.swing.JFrame {
 
         jMenuBar1.add(menuRecepcionistaFile);
 
+        administradorMenuVer.setText("Ver");
+
+        administradorMenuReportes.setText("Reportes");
+        administradorMenuVer.add(administradorMenuReportes);
+
+        jMenuBar1.add(administradorMenuVer);
+
         sesionMenu.setText("Sesion");
 
         jMenuItem1.setText("Iniciar");
@@ -1522,6 +1719,8 @@ public class Principal extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
+
+        bindingGroup.bind();
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -1637,7 +1836,7 @@ public class Principal extends javax.swing.JFrame {
             int type = usrTypeCombo.getSelectedIndex()+1;
             Usuario nuevo = new Usuario(name, usr, pass, type);
             if (!actualizar) save(nuevo, null, null, FRAMEUSUARIO);
-            if (actualizar) save(nuevo, fields("nombre"), fields("usuario"), FRAMEUSUARIO);
+            if (actualizar) save(nuevo, funciones.fields("nombre"), funciones.fields("usuario"), FRAMEUSUARIO);
 
 
 //        try {   
@@ -1670,8 +1869,46 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_administradorMenuPCActionPerformed
 
     private void operadorMenuAlmacenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operadorMenuAlmacenActionPerformed
+//        almacenPanelInfo.setEnabled(false);
         frameAlmacen.setVisible(true);
         fillCombo(null, new Envio(0,0,0,""), almacenCodEnvioCombo);
+        String codigoE = JOptionPane.showInputDialog("Por favor ingrese el Codigo del Envio a visualizar");
+        System.out.println(codigoE);
+        if(codigoE != "Item 1" && codigoE != "Default" && codigoE != "null") {
+            almacenCodEnvioCombo.setSelectedItem(codigoE);
+             buscado = new Almacen(Integer.parseInt(codigoE), 0, 0, "", 0);
+            consulta = connectionManager.select(buscado, funciones.fields("*"), funciones.fields("CodEnvio"));
+            try{
+                consulta.first();
+            if (!consulta.wasNull()){ 
+                buscado = recuperar(consulta, Almacen.class.getSimpleName());
+//                buscado = new Almacen(
+//                    consulta.getInt("CodEnvio"),
+//                    consulta.getInt("CodPc"),
+//                    consulta.getInt("CodRuta"),
+//                    consulta.getString("Destino"),
+//                    consulta.getInt("Tiempo"),
+//                    consulta.getInt("TarifaA"),
+//                    consulta.getInt("Costo")
+//                    );
+                System.out.println(buscado.where(funciones.fields("costo")));
+                almacenTiempoSpin.setValue(((Almacen) buscado).getTiempo());
+                almacenCodPCCombo.setSelectedItem(((Almacen) buscado).getCodPC());
+                almacenCodDestino.setText(((Almacen) buscado).getDestino());
+                almacenCodRuta.setText(String.valueOf(((Almacen) buscado).getCodRuta()));
+                almacenCostoTxt.setText(String.valueOf(((Almacen) buscado).getCosto()));
+                almacenTarifaTxt.setText(String.valueOf(((Almacen) buscado).getTarifaA()));
+                
+                
+            }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
+        actualizar = true;
+        consulta = null;
+        
     }//GEN-LAST:event_operadorMenuAlmacenActionPerformed
 
     private void recepcionistaMenuClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_recepcionistaMenuClienteActionPerformed
@@ -1785,7 +2022,8 @@ public class Principal extends javax.swing.JFrame {
         try {
             consulta = connectionManager.select("PuntoControl", "Tarifa", "Codigo = 1 AND CodRuta = " + codRuta + " AND Destino = '" + destino + "'");
             consulta.first();
-            if (!consulta.wasNull()) nuevo = new Almacen(codigo, 1, codRuta, destino, consulta.getDouble("Tarifa"));
+            if (!consulta.wasNull() && consulta.getDouble("Tarifa") != 0) nuevo = new Almacen(codigo, 1, codRuta, destino, consulta.getDouble("Tarifa"));
+            if (!consulta.wasNull() && consulta.getDouble("Tarifa") == 0) nuevo = new Almacen(codigo, 1, codRuta, destino, consulta.getDouble("TarifaG"));
             save(nuevo, null, null, FRAMEENVIO);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(frameEnvio, "Ruta sin puntos de control");
@@ -1805,7 +2043,7 @@ public class Principal extends javax.swing.JFrame {
 
     private void pcDestinoComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pcDestinoComboActionPerformed
         String destino = String.valueOf(pcDestinoCombo.getSelectedItem());
-        if(destino != "Item 1" && destino != "Default")fillCombo(fields("destino"), new Ruta(0,destino), pcRutaCombo);
+        if(destino != "Item 1" && destino != "Default")fillCombo(funciones.fields("destino"), new Ruta(0,destino), pcRutaCombo);
     }//GEN-LAST:event_pcDestinoComboActionPerformed
 
     private void pcDestinoComboItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_pcDestinoComboItemStateChanged
@@ -1814,7 +2052,7 @@ public class Principal extends javax.swing.JFrame {
 
     private void envioCodDestinoComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_envioCodDestinoComboActionPerformed
        String destino = String.valueOf(envioCodDestinoCombo.getSelectedItem());
-        if(destino != "Item 1" && destino != "Default")fillCombo(fields("destino"), new Ruta(0,destino), envioCodRutaCombo);
+        if(destino != "Item 1" && destino != "Default")fillCombo(funciones.fields("destino"), new Ruta(0,destino), envioCodRutaCombo);
     }//GEN-LAST:event_envioCodDestinoComboActionPerformed
 
     private void envioCodPaqueteComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_envioCodPaqueteComboActionPerformed
@@ -1822,8 +2060,77 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_envioCodPaqueteComboActionPerformed
 
     private void almacenCodEnvioComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_almacenCodEnvioComboActionPerformed
-        
+//       String codigoE = String.valueOf(almacenCodEnvioCombo.getSelectedItem());
+//       String codigoE = JOptionPane.showInputDialog("Por favor ingrese el Codigo del Envio a visualizar");
+//        System.out.println(codigoE);
+//        if(codigoE != "Item 1" && codigoE != "Default" && codigoE != "null") {
+//             buscado = new Almacen(Integer.parseInt(codigoE), 0, 0, "", 0);
+//            consulta = connectionManager.select(buscado, fields("*"), fields("CodEnvio"));
+//            try{
+//                consulta.first();
+//            if (!consulta.wasNull()){ 
+//                buscado = recuperar(consulta, Almacen.class.getSimpleName());
+////                buscado = new Almacen(
+////                    consulta.getInt("CodEnvio"),
+////                    consulta.getInt("CodPc"),
+////                    consulta.getInt("CodRuta"),
+////                    consulta.getString("Destino"),
+////                    consulta.getInt("Tiempo"),
+////                    consulta.getInt("TarifaA"),
+////                    consulta.getInt("Costo")
+////                    );
+//                System.out.println(buscado.where(fields("tarifa")));
+//                almacenTiempoSpin.setValue(((Almacen) buscado).getTiempo());
+//                almacenCodPCCombo.setSelectedItem(((Almacen) buscado).getCodPC());
+//                almacenCodDestino.setText(((Almacen) buscado).getDestino());
+//                almacenCodRuta.setText(String.valueOf(((Almacen) buscado).getCodRuta()));
+//                almacenCostoTxt.setText(String.valueOf(((Almacen) buscado).getCosto()));
+//                almacenTarifaTxt.setText(String.valueOf(((Almacen) buscado).getTarifaA()));
+//                
+//                
+//            }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        
+//        actualizar = true;
+//        consulta = null;
     }//GEN-LAST:event_almacenCodEnvioComboActionPerformed
+
+    private void almacenGuardarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_almacenGuardarBtnActionPerformed
+        int codE = Integer.parseInt(String.valueOf(almacenCodEnvioCombo.getSelectedItem()));
+        double costo;
+        int time = Integer.parseInt(String.valueOf(almacenTiempoSpin.getValue()));
+        if (codE == ((Almacen)buscado).getCodEnvio() && actualizar || time > ((Almacen)buscado).getTiempo()) {
+            costo = Double.parseDouble(almacenCostoTxt.getText()) + (Double.parseDouble(almacenTarifaTxt.getText()) * Double.parseDouble(String.valueOf(almacenTiempoSpin.getValue())));
+           almacenCostoTxt.setText(String.valueOf(costo));
+           ((Almacen)buscado).setCosto(costo);
+           ((Almacen)buscado).setTiempo(time);
+           connectionManager.update(buscado, funciones.fields("costo,tiempo"), funciones.fields("codEnvio"));
+        }
+        
+    }//GEN-LAST:event_almacenGuardarBtnActionPerformed
+
+    private void almacenCodPCComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_almacenCodPCComboActionPerformed
+//        int codigoPc = Integer.parseInt(String.valueOf(almacenCodEnvioCombo.getSelectedItem()));
+//        Double costo;
+//        if ((((Almacen) buscado).getCodPC() != codigoPc) && actualizar) {
+//            costo = Double.parseDouble(almacenCostoTxt.getText()) + (Double.parseDouble(almacenTarifaTxt.getText()) * Double.parseDouble(String.valueOf(almacenTiempoSpin.getValue())));
+//            almacenCostoTxt.setText(String.valueOf(costo));
+//        }
+//         try {
+//            consulta = connectionManager.select("PuntoControl", "Tarifa", "Codigo = " + codigoPc +" AND CodRuta = " + codRuta + " AND Destino = '" + destino + "'");
+//            consulta.first();
+//            if (!consulta.wasNull() && consulta.getDouble("Tarifa") != 0) almacenTarifaTxt.setText(String.valueOf(consulta.getDouble("Tarifa")));
+//            if (!consulta.wasNull() && consulta.getDouble("Tarifa") == 0) almacenTarifaTxt.setText(String.valueOf(consulta.getDouble("TarifaG")));
+////            if (!consulta.wasNull() && consulta.getDouble("Tarifa") == 0) nuevo = new Almacen(codigo, 1, codRuta, destino, consulta.getDouble("TarifaG"));
+////            save(nuevo, null, null, FRAMEENVIO);
+//        } catch (Exception e) {
+//            JOptionPane.showMessageDialog(frameEnvio, "Ruta sin puntos de control");
+//            e.printStackTrace();
+//        }
+    }//GEN-LAST:event_almacenCodPCComboActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1865,16 +2172,20 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JPasswordField LogInPassTxt;
     private javax.swing.JMenu administradorMenuModificar;
     private javax.swing.JMenuItem administradorMenuPC;
+    private javax.swing.JMenuItem administradorMenuReportes;
     private javax.swing.JMenuItem administradorMenuRuta;
     private javax.swing.JMenuItem administradorMenuUsuario;
+    private javax.swing.JMenu administradorMenuVer;
     private javax.swing.JTextField almacenCodDestino;
     private javax.swing.JComboBox<String> almacenCodEnvioCombo;
     private javax.swing.JComboBox<String> almacenCodPCCombo;
     private javax.swing.JTextField almacenCodRuta;
-    private javax.swing.JTextField almacenCostoTxt;
+    private javax.swing.JFormattedTextField almacenCostoTxt;
     private javax.swing.JButton almacenGuardarBtn;
+    private javax.swing.JPanel almacenPanelInfo;
+    private javax.swing.JPanel almacenPanelSave;
     private javax.swing.JTextField almacenTarifaTxt;
-    private javax.swing.JFormattedTextField almacenTiempoTxt;
+    private javax.swing.JSpinner almacenTiempoSpin;
     private javax.swing.JTextField clientNameTxt;
     private javax.swing.JTextField clientNitTxt;
     private javax.swing.JButton clientSaveBtn;
@@ -1900,6 +2211,7 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JInternalFrame frameUsuario;
     private javax.swing.JLabel incorrectValuesLbl;
     private javax.swing.JDesktopPane jDesktopPane1;
+    private javax.swing.JInternalFrame jInternalFrame1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -1945,6 +2257,11 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTable jTable1;
     private javax.swing.JButton logInBtn;
     private javax.swing.JInternalFrame logInFrame;
     private javax.swing.JTextField logInUsrTxt;
@@ -1974,6 +2291,7 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JCheckBox rutaEstadoCheck;
     private javax.swing.JButton rutaSaveBtn;
     private javax.swing.JMenu sesionMenu;
+    private javax.swing.JTable tablaRutaYPaquetes;
     private javax.swing.JTextField usrNameTxt;
     private javax.swing.JPasswordField usrPassTxt;
     private javax.swing.JButton usrSaveBtn;
@@ -1981,5 +2299,6 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JToggleButton usrShowPassBtn;
     private javax.swing.JComboBox<String> usrTypeCombo;
     private javax.swing.JTextField usrUsrTxt;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 }

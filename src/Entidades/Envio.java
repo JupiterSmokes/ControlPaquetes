@@ -6,12 +6,13 @@
 package Entidades;
 
 import DBManager.Insertable;
+import DBManager.Joinable;
 
 /**
  *
  * @author DANIEL
  */
-public class Envio implements Insertable{
+public class Envio implements Insertable, Joinable{
     private int codigo;
     private int codPaquete;
     private int codRuta;
@@ -46,6 +47,18 @@ public class Envio implements Insertable{
         }
     }
 
+    public String join(String table){
+        String join = "INNER JOIN ";
+        switch (table){
+            case "ruta":
+                join += "Ruta WHERE Envio.CodRuta = Ruta.Codigo"
+                        + "AND Envio.Destino = Ruta.Destino";
+            case "paquete":
+                join += "Paquete WHERE Envio.CodPaquete = Paquete.Codigo";
+        }
+        return join;
+    }
+    
       public String primaryKey(){
         return String.valueOf(this.getCodigo());
     }

@@ -34,14 +34,14 @@ public class Ruta implements Insertable{
             
         }
     }
-  public String primaryKey(){
+    public String primaryKey(){
         return String.valueOf(this.getCodigo());
     }
-        public String insert(){
+    public String insert(){
             return String.format("%d, '%s', %d", this.codigo, this.destino, this.est);
         }
         
-            public String update(String[] fields){
+    public String update(String[] fields){
         String update = "";
         for (String field : fields) {
             switch (field.toLowerCase()) {
@@ -125,4 +125,7 @@ public class Ruta implements Insertable{
         this.estado = estado;
     }
     
+    public Object[] toArray(){
+        return new Object[] {this.codigo, this.destino, this.estado};
+    }
 }

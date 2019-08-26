@@ -163,4 +163,18 @@ public class connectionManager {
               return false;
         } 
     }
+    
+    public static ResultSet query(String statement){
+        result = null;
+        try {
+            if (checkStatement(statement)) {
+               Statement st = connection.prepareStatement(statement);
+                       System.out.println(statement);
+               result = st.executeQuery(statement);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 }

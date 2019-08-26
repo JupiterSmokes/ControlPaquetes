@@ -24,9 +24,9 @@ public class Almacen implements Insertable{
         this.codPC = codPC;
         this.codRuta = codRuta;
         this.destino = destino;
-        this.tiempo = 0;
+        this.tiempo = 1;
         this.tarifaA = tarifaA;
-        this.costo = 0;
+        this.costo = this.tiempo * this.tarifaA;
     }
 
     public Almacen(int codEnvio, int codPC, int codRuta, String destino, int tiempo, double tarifaA, double costo) {
@@ -182,7 +182,7 @@ public class Almacen implements Insertable{
         }
         return this.costo;
     }
-    public void setCosto(int costo) {
+    public void setCosto(double costo) {
         this.costo = costo;
     }
 
