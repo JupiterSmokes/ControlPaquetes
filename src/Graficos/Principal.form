@@ -258,29 +258,27 @@
                               <Component id="jInternalFrame1" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace min="-2" pref="571" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="220" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
                               <Component id="frameRuta" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              <EmptySpace min="-2" pref="261" max="-2" attributes="0"/>
                           </Group>
-                          <Group type="102" alignment="1" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <Component id="frameEnvio" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace pref="14" max="32767" attributes="0"/>
-                                      <Component id="frameAlmacen" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" attributes="0">
-                                      <Component id="frameCliente" min="-2" pref="205" max="-2" attributes="0"/>
-                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                      <Component id="framePuntoControl" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                                  </Group>
+                          <Group type="103" alignment="1" groupAlignment="0" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="frameEnvio" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
+                                  <Component id="frameAlmacen" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace min="-2" pref="233" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="frameCliente" min="-2" pref="205" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="framePuntoControl" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              </Group>
                           </Group>
                       </Group>
+                      <EmptySpace min="-2" pref="580" max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -1208,7 +1206,7 @@
                           </Group>
                           <EmptySpace min="-2" pref="35" max="-2" attributes="0"/>
                           <Component id="pcSaveBtn" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="60" max="32767" attributes="0"/>
+                          <EmptySpace pref="68" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1408,7 +1406,7 @@
                               </Group>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="envioGuardarBtn" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="43" max="32767" attributes="0"/>
+                              <EmptySpace pref="51" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -1697,7 +1695,7 @@
                               </Group>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="almacenGuardarBtn" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="62" max="32767" attributes="0"/>
+                              <EmptySpace pref="70" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -1736,6 +1734,7 @@
             </Container>
             <Container class="javax.swing.JInternalFrame" name="jInternalFrame1">
               <Properties>
+                <Property name="closable" type="boolean" value="true"/>
                 <Property name="defaultCloseOperation" type="int" value="1"/>
                 <Property name="iconifiable" type="boolean" value="true"/>
                 <Property name="visible" type="boolean" value="true"/>
@@ -1755,7 +1754,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jTabbedPane1" pref="231" max="32767" attributes="0"/>
+                          <Component id="jTabbedPane1" pref="239" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -1793,7 +1792,7 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="jScrollPane1" min="-2" pref="132" max="-2" attributes="0"/>
-                                  <EmptySpace pref="83" max="32767" attributes="0"/>
+                                  <EmptySpace pref="91" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -1865,7 +1864,7 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="jScrollPane2" min="-2" pref="164" max="-2" attributes="0"/>
-                                  <EmptySpace pref="51" max="32767" attributes="0"/>
+                                  <EmptySpace pref="59" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>

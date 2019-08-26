@@ -297,6 +297,7 @@ public class Principal extends javax.swing.JFrame {
         frameEnvio.doDefaultCloseAction();
         framePuntoControl.doDefaultCloseAction();
         frameRuta.doDefaultCloseAction();
+        jInternalFrame1.doDefaultCloseAction();
         clear(true, 0);
         actual = null;
     }
@@ -1166,7 +1167,7 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(pcTarifaDeOperacionTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(35, 35, 35)
                 .addComponent(pcSaveBtn)
-                .addContainerGap(60, Short.MAX_VALUE))
+                .addContainerGap(68, Short.MAX_VALUE))
         );
 
         frameEnvio.setClosable(true);
@@ -1276,7 +1277,7 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(envioRecibidoCheck))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(envioGuardarBtn)
-                .addContainerGap(43, Short.MAX_VALUE))
+                .addContainerGap(51, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout frameEnvioLayout = new javax.swing.GroupLayout(frameEnvio.getContentPane());
@@ -1408,7 +1409,7 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(almacenTiempoSpin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(almacenGuardarBtn)
-                .addContainerGap(62, Short.MAX_VALUE))
+                .addContainerGap(70, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout frameAlmacenLayout = new javax.swing.GroupLayout(frameAlmacen.getContentPane());
@@ -1432,6 +1433,7 @@ public class Principal extends javax.swing.JFrame {
                 .addGap(53, 53, 53))
         );
 
+        jInternalFrame1.setClosable(true);
         jInternalFrame1.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
         jInternalFrame1.setIconifiable(true);
         jInternalFrame1.setVisible(true);
@@ -1462,7 +1464,7 @@ public class Principal extends javax.swing.JFrame {
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(83, Short.MAX_VALUE))
+                .addContainerGap(91, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("tab1", jPanel7);
@@ -1494,7 +1496,7 @@ public class Principal extends javax.swing.JFrame {
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(51, Short.MAX_VALUE))
+                .addContainerGap(59, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("tab2", jPanel8);
@@ -1512,7 +1514,7 @@ public class Principal extends javax.swing.JFrame {
             jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jInternalFrame1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1567,23 +1569,22 @@ public class Principal extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDesktopPane1Layout.createSequentialGroup()
                         .addGap(31, 31, 31)
                         .addComponent(jInternalFrame1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(571, 571, 571)
+                .addGap(220, 220, 220)
                 .addGroup(jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jDesktopPane1Layout.createSequentialGroup()
                         .addComponent(frameRuta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDesktopPane1Layout.createSequentialGroup()
-                        .addGroup(jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jDesktopPane1Layout.createSequentialGroup()
-                                .addComponent(frameEnvio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
-                                .addComponent(frameAlmacen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jDesktopPane1Layout.createSequentialGroup()
-                                .addComponent(frameCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(framePuntoControl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addGap(233, 233, 233))))
+                        .addGap(261, 261, 261))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jDesktopPane1Layout.createSequentialGroup()
+                            .addComponent(frameEnvio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(frameAlmacen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jDesktopPane1Layout.createSequentialGroup()
+                            .addComponent(frameCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(framePuntoControl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(0, 0, Short.MAX_VALUE))))
+                .addGap(580, 580, 580))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
